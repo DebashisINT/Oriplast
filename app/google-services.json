@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "526786342762",
+    "project_id": "oriplast-e390b",
+    "storage_bucket": "oriplast-e390b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:526786342762:android:2d92490cbebf01e74eff13",
+        "android_client_info": {
+          "package_name": "com.oriplast"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "526786342762-871qcu8pdb5hbqunvgmhdimdif0r6kmk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkIskDYUTkLhFALTbw4kddMumK6Bjq7s0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "526786342762-871qcu8pdb5hbqunvgmhdimdif0r6kmk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
