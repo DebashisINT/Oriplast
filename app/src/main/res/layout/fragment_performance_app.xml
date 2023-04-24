@@ -13,7 +13,7 @@
         android:orientation="horizontal"
         android:weightSum="2">
 
-        <com.oriplast.widgets.AppCustomTextView
+        <com.oriplastbreezefsm.widgets.AppCustomTextView
             android:id="@+id/ownPerformace_TV_frag_performace_app"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
             android:textStyle="bold"
             android:textColor="@drawable/selector_text_color_white_performance" />
 
-        <com.oriplast.widgets.AppCustomTextView
+        <com.oriplastbreezefsm.widgets.AppCustomTextView
             android:id="@+id/teamPerformace_TV_frag_performace_app"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
