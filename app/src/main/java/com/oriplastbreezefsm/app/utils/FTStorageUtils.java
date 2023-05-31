@@ -55,7 +55,7 @@ import static android.content.Context.ACTIVITY_SERVICE;
 
 public class FTStorageUtils {
 
-    private static String APP_FOLDERNAME = "oriplastApp/FTS";
+    private static String APP_FOLDERNAME = "oriplastbreezefsmApp/FTS";
     private static String folderPath;
     public static Uri IMG_URI = null;
     private static final int EOF = -1;

@@ -20,6 +20,9 @@ import com.oriplastbreezefsm.features.nearbyshops.model.ShopData
 import com.oriplastbreezefsm.widgets.AppCustomEditText
 import com.oriplastbreezefsm.widgets.AppCustomTextView
 
+/**
+ * Created by Saheli on 12-03-2023 v 4.0.8 mantis 0025860.
+ */
 class ShopListDialog: DialogFragment() {
 
     private lateinit var header: AppCustomTextView

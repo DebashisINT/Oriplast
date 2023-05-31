@@ -1129,7 +1129,7 @@ class NewDateWiseOrderListFragment : BaseFragment(), DatePickerListener, View.On
         var fileName = "FTS"+ "_" + obj.order_id
         fileName = fileName.replace("/", "_")
 
-        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() +"/oriplastApp/ORDERDETALIS/"
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() +"/oriplastbreezefsmApp/ORDERDETALIS/"
 
         val dir = File(path)
         if (!dir.exists()) {

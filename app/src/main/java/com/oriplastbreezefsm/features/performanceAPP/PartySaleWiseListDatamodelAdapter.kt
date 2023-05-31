@@ -11,6 +11,9 @@ import com.oriplastbreezefsm.R
 import com.oriplastbreezefsm.app.domain.AddShopDBModelEntity
 import kotlinx.android.synthetic.main.row_dialog_tax_multiple.view.*
 
+/**
+ * Created by Saheli on 17-04-2023 v 4.0.8 mantis 0025860.
+ */
 class PartySaleWiseListDatamodelAdapter(private var context:Context, private var mshopTypeList: ArrayList<AddShopDBModelEntity>, private var finalL:ArrayList<PerformDataClass>,private val listner: OnClick):
   RecyclerView.Adapter<PartySaleWiseListDatamodelAdapter.GenderListViewHolder>(), Filterable {
     private var arrayList_bean: ArrayList<AddShopDBModelEntity>? = ArrayList()

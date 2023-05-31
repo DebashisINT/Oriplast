@@ -618,11 +618,11 @@ public class FileUtils {
     }
 
 
-    public static String getoriplastCardJson(Context mContext) {
+    public static String getoriplastbreezefsmCardJson(Context mContext) {
         String bufferString = "";
         try {
             byte[] buffer;
-            InputStream is = mContext.getAssets().open("oriplastCardData.json");
+            InputStream is = mContext.getAssets().open("oriplastbreezefsmCardData.json");
             int size = is.available();
             buffer = new byte[size];
             is.read(buffer);

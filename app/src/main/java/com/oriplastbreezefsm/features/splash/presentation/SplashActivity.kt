@@ -554,7 +554,7 @@ class SplashActivity : BaseActivity(), GpsStatusDetector.GpsStatusDetectorCallBa
                             override fun onNewLocationAvailable(location: Location) {
                                 Pref.latitude = location.latitude.toString()
                                 Pref.longitude = location.longitude.toString()
-
+                                Timber.d("Splash onNewLocationAvailable ${Pref.latitude} ${Pref.longitude}")
                                 progress_wheel.stopSpinning()
 
                                 startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
@@ -565,6 +565,7 @@ class SplashActivity : BaseActivity(), GpsStatusDetector.GpsStatusDetectorCallBa
                 }
                 catch (ex:Exception){
                     ex.printStackTrace()
+                    Timber.d("Splash onNewLocationAvailable ex ${ex.message}")
                     progress_wheel.stopSpinning()
                     startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out)

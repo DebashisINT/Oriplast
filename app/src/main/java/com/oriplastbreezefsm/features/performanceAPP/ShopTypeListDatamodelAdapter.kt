@@ -11,6 +11,9 @@ import com.oriplastbreezefsm.R
 import com.oriplastbreezefsm.features.nearbyshops.model.ShopTypeDataModel
 import kotlinx.android.synthetic.main.row_dialog_tax.view.*
 
+/**
+ * Created by Saheli on 12-03-2023 v 4.0.8 mantis 0025860.
+ */
 class ShopTypeListDatamodelAdapter(private var context:Context, private var mshopTypeList: ArrayList<ShopTypeDataModel>, private val listner: OnClick):
   RecyclerView.Adapter<ShopTypeListDatamodelAdapter.GenderListViewHolder>(), Filterable {
     private var arrayList_bean: ArrayList<ShopTypeDataModel>? = ArrayList()

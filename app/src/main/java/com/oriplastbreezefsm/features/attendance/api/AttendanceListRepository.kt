@@ -1,8 +1,6 @@
 package com.oriplastbreezefsm.features.attendance.api
 
-import com.oriplastbreezefsm.features.attendance.model.AttendanceRequest
-import com.oriplastbreezefsm.features.attendance.model.AttendanceResponse
-import com.oriplastbreezefsm.features.attendance.model.DayStartEndListResponse
+import com.oriplastbreezefsm.features.attendance.model.*
 import io.reactivex.Observable
 
 /**
@@ -15,5 +13,9 @@ class AttendanceListRepository(val apiService: AttendanceListApi) {
 
     fun getDayStartEndList(attendanceRequest: AttendanceRequest?): Observable<DayStartEndListResponse> {
         return apiService.getDayStartEndListAPI(attendanceRequest)
+    }
+
+    fun getNotVisitedPartyList(inputRequest: InputRequest?): Observable<OutputResponse> {
+        return apiService.getPartyListNotVisited(inputRequest)
     }
 }

@@ -53,6 +53,9 @@ interface OrderDetailsListDao {
     @Query("select SUM(amount) from order_details_list where shop_id=:shop_id ")
     fun getOrderSumAmt(shop_id: String): String
 
+    @Query("select * from order_details_list where shop_id=:shop_id ")
+    fun getOrderAmtShop(shop_id: String): List<OrderDetailsListEntity>
+
     @Query("select amount from order_details_list where order_id=:order_id ")
     fun getOrderAmt(order_id: String): String
 
@@ -75,10 +78,16 @@ interface OrderDetailsListDao {
     @Query("select count(*) as total_order_count FROM "+AppConstant.ORDER_DETAILS_LIST_TABLE+" where date(date) BETWEEN :dateOfmonth1stdate AND :currentDate")
     fun getOrderCountMTD(dateOfmonth1stdate: String,currentDate:String): String
 
-    @Query("select sum(amount) as toltaOrdV from order_details_list where shop_id in(select shop_id from shop_detail where type=:type) order by id desc limit 10")
+    /*@Query("select sum(amount) as toltaOrdV from order_details_list where shop_id in(select shop_id from shop_detail where type=:type) order by id desc limit 10")
+    fun getTotalOrdershopTypewise(type: String): String*/
+
+//    @Query("select * from order_details_list inner join shop_detail on order_details_list.shop_id = shop_detail.shop_id where shop_detail.type=:type order by order_details_list.id desc limit 10")
+//    fun getTotalOrdershopTypewise(type: String): List<OrderDetailsListEntity>
+
+    @Query("select sum(amount) from (select * from order_details_list inner join shop_detail on order_details_list.shop_id = shop_detail.shop_id where shop_detail.type=:type order by order_details_list.id desc limit 10)")
     fun getTotalOrdershopTypewise(type: String): String
 
-    @Query("select count(*) as toltaOrdCount from order_details_list where shop_id in(select shop_id from shop_detail where type=:type) order by id desc limit 10")
+    @Query("select count(*) as toltaOrdCount from (select * from order_details_list inner join shop_detail on order_details_list.shop_id = shop_detail.shop_id where shop_detail.type=:type order by order_details_list.id desc limit 10)")
     fun getOrderCountshopTypewise(type: String): String
 
 
@@ -91,5 +100,6 @@ interface OrderDetailsListDao {
 
     @Query("select sum(amount) as total_sales_value,(select shop_name from shop_detail where shop_id=:shop_id)  as shop_name ,(select shoptype_name from shop_type_list where shoptype_id =(select type from shop_detail where shop_id=:shop_id)) as shop_type_name from order_details_list where shop_id=:shop_id")
     fun getTotalShopNTwiseSalesValues(shop_id: String): PartyWiseDataModel
+
 
 }

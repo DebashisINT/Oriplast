@@ -30,6 +30,9 @@ public interface AddShopDao {
     @Query("SELECT * FROM " + SHOP_TABLE)
     List<AddShopDBModelEntity> getAll();
 
+    @Query("SELECT * FROM " + SHOP_TABLE +" order by upper(shop_name)")
+    List<AddShopDBModelEntity> getOrderByalphabeticallyAll();
+
     @Query("SELECT * FROM " + SHOP_TABLE+" where isOwnshop=:isOwnshop")
     List<AddShopDBModelEntity> getAllOwn(Boolean isOwnshop);
 

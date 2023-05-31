@@ -20,6 +20,9 @@ import kotlinx.android.synthetic.main.row_dialog_new_order_gender.view.*
 import kotlinx.android.synthetic.main.row_dialog_new_order_gender.view.tv_row_dialog_new_order_gender
 import kotlinx.android.synthetic.main.row_dialog_tax.view.*
 
+/**
+ * Created by Saheli on 11-03-2023 v 4.0.8 mantis 0025860.
+ */
 class ShopTypeListAdapter(private var context:Context, private var mshopTypeList: ArrayList<ShopTypeEntity>, private val listner: OnClick):
   RecyclerView.Adapter<ShopTypeListAdapter.GenderListViewHolder>(), Filterable {
     private var arrayList_bean: ArrayList<ShopTypeEntity>? = ArrayList()

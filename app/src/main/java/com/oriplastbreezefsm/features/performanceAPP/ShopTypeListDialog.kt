@@ -22,6 +22,9 @@ import com.oriplastbreezefsm.features.member.model.TeamListDataModel
 import com.oriplastbreezefsm.widgets.AppCustomEditText
 import com.oriplastbreezefsm.widgets.AppCustomTextView
 
+/**
+ * Created by Saheli on 13-03-2023 v 4.0.8 mantis 0025860.
+ */
 class ShopTypeListDialog: DialogFragment() {
 
     private lateinit var header: AppCustomTextView

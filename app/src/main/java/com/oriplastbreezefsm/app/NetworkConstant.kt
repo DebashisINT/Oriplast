@@ -12,22 +12,24 @@ class NetworkConstant {
     //Base URL
     companion object {
 
-        //var BASE_URL = "http://fts.indusnettechnologies.com:8089/API/"
-        //var ADD_SHOP_BASE_URL = "http://fts.indusnettechnologies.com:8089/"
 
-       //var BASE_URL = "http://fts.indusnettechnologies.com:7064/API/"
-        //var ADD_SHOP_BASE_URL = "http://fts.indusnettechnologies.com:7064/"
-
-       var BASE_URL = "http://fts.indusnettechnologies.com:7067/API/"
+//       var BASE_URL = "http://fts.indusnettechnologies.com:8094/API/"
+//        var ADD_SHOP_BASE_URL = "http://fts.indusnettechnologies.com:8094/"
+//
+        var BASE_URL = "http://fts.indusnettechnologies.com:7067/API/"
         var ADD_SHOP_BASE_URL = "http://fts.indusnettechnologies.com:7067/"
+//
+
+//
+//        var BASE_URL = "http://3.7.30.86:8072/API/"
+//        var ADD_SHOP_BASE_URL = "http://3.7.30.86:8072/"
 
 
-        //var BASE_URL = "http://3.7.30.86:8072/API/"
-        //var ADD_SHOP_BASE_URL = "http://3.7.30.86:8072/"
+        //var BASE_URL = "http://localhost:8081/API/"
+        //var ADD_SHOP_BASE_URL = "http://localhost:8081/"
 
-
-//        var BASE_URL = "http://3.7.30.86:82/API/"// face test with suman
-//        var ADD_SHOP_BASE_URL = "http://3.7.30.86:82/"
+        //var BASE_URL = "http://192.168.4.112:8081/API/"
+        //var ADD_SHOP_BASE_URL = "http://192.168.4.112:8081/"
 
 
 
@@ -48,7 +50,7 @@ class NetworkConstant {
 //         var BASE_URL="http://hrms.indusnettechnologies.com:7025/API/"
 //         var ADD_SHOP_BASE_URL="http://hrms.indusnettechnologies.com:7025"
 
-        /*oriplast INTERNAL*/
+        /*oriplastbreezefsm INTERNAL*/
 //        var BASE_URL="http://geapl.breezeerp.in:8083/API/"
 //        var ADD_SHOP_BASE_URL="http://geapl.breezeerp.in:8083/"
 

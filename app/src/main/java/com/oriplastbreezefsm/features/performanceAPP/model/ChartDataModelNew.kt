@@ -6,6 +6,9 @@ import com.github.aachartmodel.aainfographics.aachartcreator.AAChartType
 import com.github.aachartmodel.aainfographics.aachartcreator.AASeriesElement
 import com.github.aachartmodel.aainfographics.aaoptionsmodel.AADataLabels
 
+/**
+ * Created by Saheli on 10-04-2023 v 4.0.8 mantis 0025860.
+ */
 class ChartDataModelNew {
     companion object{
 
@@ -30,10 +33,10 @@ class ChartDataModelNew {
                             .format("<b></b> {point.percentage:.1f} %"))
                         .data(arrayOf(
                             arrayOf("Present",   attendP),
-                            arrayOf("Absent", absentP)
+                            arrayOf("Not Logged In", absentP)
                         ))))
         }
-        fun configurePolarColumnChart(totalOrdervalue:Double,totalOrderCount:Double,avgOrdervalue:Double,avgOrdercount:Double): AAChartModel {
+        fun configurePolarColumnChart(totalOrdervalue:Double,totalOrderCount:Double,avgOrdervalue:Double,avgOrdercount:Int): AAChartModel {
             return AAChartModel()
                 .chartType(AAChartType.Column)
                 .polar(false)
@@ -41,7 +44,7 @@ class ChartDataModelNew {
                 .legendEnabled(false)
                 .yAxisTitle("")
                 .colorsTheme(arrayOf("#158650", "#0a69ab","#b5740e", "#b12408"))
-                .categories(arrayOf("Total Order Values", "Total Order Count","Avg Order Value","Avg Order Count"))
+                .categories(arrayOf("Total<br>Order<br>Values", "Total<br>Order<br>Count","Avg<br>Order<br>Value","Avg<br>Order<br>Count"))
                 .series(arrayOf(
                     AASeriesElement()
                         .name("")
@@ -69,6 +72,7 @@ class ChartDataModelNew {
                         .name("")
                         .colorByPoint(true)
                         .data(arrOfValue as Array<Any>)
+                        .size(20)
                 ))
         }
     }

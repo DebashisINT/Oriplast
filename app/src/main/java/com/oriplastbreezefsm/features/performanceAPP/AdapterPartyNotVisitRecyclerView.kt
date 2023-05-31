@@ -6,9 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.oriplastbreezefsm.R
+import com.oriplastbreezefsm.app.utils.AppUtils
+import com.oriplastbreezefsm.features.attendance.model.last_visit_order_list
 import kotlinx.android.synthetic.main.row_party_notvisited_list.view.*
 
-class AdapterPartyNotVisitRecyclerView(var context: Context, var dataList:ArrayList<List_Party_Last20>):
+/**
+ * Created by Saheli on 13-04-2023 v 4.0.8 mantis 0025860.
+ */
+class AdapterPartyNotVisitRecyclerView(var context: Context, var dataList:ArrayList<last_visit_order_list>):
     RecyclerView.Adapter<AdapterPartyNotVisitRecyclerView.AdapterPartyNotVisitViewHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdapterPartyNotVisitViewHolder {
@@ -18,13 +23,13 @@ class AdapterPartyNotVisitRecyclerView(var context: Context, var dataList:ArrayL
 
     override fun onBindViewHolder(holder: AdapterPartyNotVisitViewHolder, position: Int) {
         holder.shopNameTV.text=dataList.get(position).shop_name
-        holder.shopTypeTv.text=dataList.get(position).shop_type
-        holder.shopwiseLastOrderDt.text=dataList.get(position).last_order_date
-        holder.shopwiseLastVisitDt.text=dataList.get(position).last_visit_date
+        holder.shopTypeTv.text=dataList.get(position).shop_TypeName
+        holder.shopwiseLastOrderDt.text="Last Order Date \n "+ AppUtils.convertPartyNotVisitedFormat(dataList.get(position).last_order_date)
+        holder.shopwiseLastVisitDt.text="Last Visit Date \n "+ AppUtils.convertPartyNotVisitedFormat(dataList.get(position).last_visited_date)
     }
 
     override fun getItemCount(): Int {
-        return dataList!!.size
+        return dataList.size
     }
 
     inner class AdapterPartyNotVisitViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){

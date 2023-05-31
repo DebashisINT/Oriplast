@@ -9,6 +9,9 @@ import com.oriplastbreezefsm.R
 import com.oriplastbreezefsm.features.performanceAPP.PartyWiseDataModel
 import kotlinx.android.synthetic.main.row_party_wise_sales_list.view.*
 
+/**
+ * Created by Saheli on 13-04-2023 v 4.0.8 mantis 0025860.
+ */
 class AdapterPartywiseSalesRecyclerView(var context: Context, var dataList:ArrayList<PartyWiseDataModel>):
     RecyclerView.Adapter<AdapterPartywiseSalesRecyclerView.AdapterPartyNotVisitViewHolder>(){
 

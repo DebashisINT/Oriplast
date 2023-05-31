@@ -57,6 +57,7 @@
                                 android:textSize="@dimen/_12sdp" />
 
                             <TextView
+                                android:id="@+id/tv_frag_own_perf_attend_heading_month"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
@@ -167,7 +168,7 @@
                                         android:layout_gravity="center"
                                         android:layout_weight="1"
                                         android:gravity="center"
-                                        android:text="Absent"
+                                        android:text="Not Logged In"
                                         android:textColor="@color/black"
                                         android:textSize="@dimen/_10sdp"
                                         android:textStyle="bold" />
@@ -243,6 +244,7 @@
                                 android:textSize="@dimen/_12sdp" />
 
                             <TextView
+                                android:id="@+id/tv_frag_own_perf_mtd_heading_month"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
@@ -427,11 +429,11 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:layout_weight="1.9"
+                                android:layout_weight="0"
                                 android:gravity="center|start"
-                                android:text="Last 10 Orders"
+                                android:text="Recent 10 Orders"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_12sdp" />
 
@@ -440,7 +442,8 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:gravity="center|start"
-                                android:text="(based on type of shops)"
+                                android:visibility="invisible"
+                                android:text=""
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_9sdp" />
 
@@ -668,12 +671,13 @@
                             android:orientation="horizontal">
 
                             <LinearLayout
-                                android:layout_width="@dimen/_130sdp"
+                                android:layout_width="match_parent"
                                 android:layout_height="@dimen/_35sdp"
-                                android:layout_marginLeft="@dimen/_12sdp"
+                                android:layout_marginLeft="@dimen/_2sdp"
                                 android:layout_marginTop="@dimen/_15sdp"
                                 android:background="@drawable/border_background_simple"
                                 android:gravity="center"
+                                android:layout_weight="1"
                                 android:orientation="horizontal">
 
                                 <LinearLayout
@@ -699,7 +703,7 @@
                                         android:layout_gravity="center"
                                         android:gravity="start|center"
                                         android:paddingLeft="@dimen/_8sdp"
-                                        android:text="Visit"
+                                        android:text="Visit age"
                                         android:textColor="@color/black"
                                         android:textSize="@dimen/_10sdp"
                                         android:textStyle="bold" />
@@ -715,7 +719,7 @@
                                     android:background="@drawable/border_background_small_1"
                                     android:backgroundTint="#f3090a"
                                     android:gravity="center"
-                                    android:text="0 \n Days ago"
+                                    android:text="0 \n Days"
                                     android:textColor="@color/white"
                                     android:textSize="@dimen/_10sdp"
                                     android:textStyle="bold" />
@@ -724,12 +728,13 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:layout_width="@dimen/_130sdp"
+                                android:layout_width="match_parent"
                                 android:layout_height="@dimen/_35sdp"
                                 android:layout_marginLeft="@dimen/_12sdp"
                                 android:layout_marginTop="@dimen/_15sdp"
                                 android:background="@drawable/border_background_simple"
                                 android:gravity="center"
+                                android:layout_weight="1"
                                 android:orientation="horizontal">
 
                                 <LinearLayout
@@ -772,7 +777,7 @@
                                     android:background="@drawable/border_background_small_1"
                                     android:backgroundTint="#051ba2"
                                     android:gravity="center"
-                                    android:text="8 \n Days ago"
+                                    android:text="0 \n Days"
                                     android:textColor="@color/white"
                                     android:textSize="@dimen/_10sdp"
                                     android:textStyle="bold" />
@@ -789,12 +794,71 @@
                             android:orientation="horizontal">
 
                             <LinearLayout
-                                android:layout_width="@dimen/_130sdp"
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/_35sdp"
+                                android:layout_marginLeft="@dimen/_2sdp"
+                                android:layout_marginTop="@dimen/_15sdp"
+                                android:background="@drawable/border_background_simple"
+                                android:gravity="center"
+                                android:layout_weight="1"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1.6"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:gravity="start|center"
+                                        android:paddingLeft="@dimen/_8sdp"
+                                        android:text="Last"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/_9sdp"
+                                        android:textStyle="normal" />
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:layout_weight="1.6"
+                                        android:gravity="start|center"
+                                        android:paddingLeft="@dimen/_8sdp"
+                                        android:text="Visited date"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/_10sdp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/tv_frag_own_performance_lastcollectionbyago"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="end"
+                                    android:layout_weight="1.6"
+                                    android:background="@drawable/border_background_small_1"
+                                    android:backgroundTint="#0ca485"
+                                    android:gravity="center"
+                                    android:text="0 \n"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/_10sdp"
+                                    android:textStyle="bold" />
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="@dimen/_35sdp"
                                 android:layout_marginLeft="@dimen/_12sdp"
                                 android:layout_marginTop="@dimen/_15sdp"
                                 android:background="@drawable/border_background_simple"
                                 android:gravity="center"
+                                android:layout_weight="1"
                                 android:orientation="horizontal">
 
                                 <LinearLayout
@@ -829,63 +893,6 @@
                                 </LinearLayout>
 
                                 <TextView
-                                    android:id="@+id/tv_frag_own_performance_lastcollectionbyago"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:layout_gravity="end"
-                                    android:layout_weight="1.6"
-                                    android:background="@drawable/border_background_small_1"
-                                    android:backgroundTint="#0ca485"
-                                    android:gravity="center"
-                                    android:text="0 \n Days ago"
-                                    android:textColor="@color/white"
-                                    android:textSize="@dimen/_10sdp"
-                                    android:textStyle="bold" />
-
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="@dimen/_130sdp"
-                                android:layout_height="@dimen/_35sdp"
-                                android:layout_marginLeft="@dimen/_12sdp"
-                                android:layout_marginTop="@dimen/_15sdp"
-                                android:background="@drawable/border_background_simple"
-                                android:gravity="center"
-                                android:orientation="horizontal">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1.6"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:layout_gravity="center"
-                                        android:gravity="start|center"
-                                        android:paddingLeft="@dimen/_8sdp"
-                                        android:text="Last"
-                                        android:textColor="@color/black"
-                                        android:textSize="@dimen/_9sdp"
-                                        android:textStyle="normal" />
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:layout_gravity="center"
-                                        android:layout_weight="1.6"
-                                        android:gravity="start|center"
-                                        android:paddingLeft="@dimen/_8sdp"
-                                        android:text="Login"
-                                        android:textColor="@color/black"
-                                        android:textSize="@dimen/_10sdp"
-                                        android:textStyle="bold" />
-
-                                </LinearLayout>
-
-                                <TextView
                                     android:id="@+id/tv_frag_own_performance_loginbyago"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
@@ -894,7 +901,7 @@
                                     android:background="@drawable/border_background_small_1"
                                     android:backgroundTint="#c8810d"
                                     android:gravity="center"
-                                    android:text="0 \n Days ago"
+                                    android:text="0 \n Days"
                                     android:textColor="@color/white"
                                     android:textSize="@dimen/_10sdp"
                                     android:textStyle="bold" />
@@ -917,9 +924,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/_5sdp"
+                    android:visibility="gone"
                     app:cardBackgroundColor="@color/white"
                     app:cardCornerRadius="@dimen/_10sdp"
-                    android:visibility="gone"
                     app:cardElevation="@dimen/_5sdp">
 
                     <LinearLayout
@@ -965,6 +972,7 @@
                                     android:background="@drawable/ic_share"
                                     android:backgroundTint="@color/white"
                                     android:padding="@dimen/_5sdp"
+                                    android:visibility="gone"
                                     android:scaleType="fitCenter" />
 
                             </androidx.cardview.widget.CardView>
@@ -975,13 +983,18 @@
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/frag_own_performance_last20nitvisited_list_rv"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:minHeight="@dimen/_100sdp"
-                            android:scrollbars="vertical"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                            tools:itemCount="2"
-                            tools:listitem="@layout/row_party_notvisited_list" />
+                            android:layout_height="@dimen/_150sdp"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+
+                        <TextView
+                            android:id="@+id/tv_no_party"
+                            android:layout_width="wrap_content"
+                            android:textSize="@dimen/_11sdp"
+                            android:text="No Party Visited"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"/>
 
                     </LinearLayout>
 

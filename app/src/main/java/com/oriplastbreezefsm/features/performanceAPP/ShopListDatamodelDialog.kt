@@ -19,6 +19,9 @@ import com.oriplastbreezefsm.app.domain.AddShopDBModelEntity
 import com.oriplastbreezefsm.widgets.AppCustomEditText
 import com.oriplastbreezefsm.widgets.AppCustomTextView
 
+/**
+ * Created by Saheli on 11-03-2023 v 4.0.8 mantis 0025860.
+ */
 class ShopListDatamodelDialog: DialogFragment() {
 
     private lateinit var header: AppCustomTextView

@@ -66,7 +66,6 @@
     <uses-permission android:name="android.permission.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
-
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
@@ -147,7 +146,7 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.google.android.exoplayer.oriplast.action.VIEW" />
+                <action android:name="com.google.android.exoplayer.oriplastbreezefsm.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
 

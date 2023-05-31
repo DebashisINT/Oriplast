@@ -16,10 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.oriplastbreezefsm.R
 import com.oriplastbreezefsm.app.domain.AddShopDBModelEntity
-import com.oriplastbreezefsm.features.photoReg.adapter.AdapterUserTestList
+import com.oriplastbreezefsm.features.performanceAPP.model.AdapterUserTestList
 import com.oriplastbreezefsm.widgets.AppCustomEditText
 import com.oriplastbreezefsm.widgets.AppCustomTextView
 
+/**
+ * Created by Saheli on 19-04-2023 v 4.0.8 mantis 0025860.
+ */
 class PartySaleWiseListDatamodelDialog: DialogFragment() {
 
     private lateinit var header: AppCustomTextView
@@ -89,8 +92,10 @@ class PartySaleWiseListDatamodelDialog: DialogFragment() {
             override fun onTickUntickView(obj: PerformDataClass, isTick: Boolean) {
                 if(isTick){
                     selectedDataL.add(obj)
+                    finalL.filter { it.shop_id.equals(obj.shop_id) }.first().isChecked = true
                 } else{
                     selectedDataL.remove(obj)
+                    finalL.filter { it.shop_id.equals(obj.shop_id) }.first().isChecked = false
                 }
             }
         },{

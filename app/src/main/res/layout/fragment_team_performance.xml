@@ -54,6 +54,7 @@
                             android:textColor="@color/black" />
 
                         <TextView
+                            android:id="@+id/tv_frag_team_perf_attend_heading"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
@@ -94,7 +95,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_30sdp"
                         android:drawableTint="@color/black"
-                        android:hint="Select Team"
+                        android:hint="Select Team Member"
                         android:paddingStart="@dimen/_10sdp"
                         android:singleLine="true"
                         android:textSize="@dimen/_11sdp"
@@ -187,7 +188,7 @@
                                     android:layout_weight="1"
                                     android:layout_gravity="center"
                                     android:gravity="center"
-                                    android:text="Absent"
+                                    android:text="Not Logged In"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/_10sdp"
                                     android:textStyle="bold" />
@@ -266,6 +267,7 @@
                             android:textColor="@color/black" />
 
                         <TextView
+                            android:id="@+id/tv_frag_team_perf_mtd_heading_month"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
@@ -306,7 +308,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_30sdp"
                         android:drawableTint="@color/black"
-                        android:hint="Select Team"
+                        android:hint="Select Team Member"
                         android:paddingStart="@dimen/_10sdp"
                         android:singleLine="true"
                         android:textSize="@dimen/_11sdp"
@@ -472,10 +474,10 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:layout_weight="1.9"
-                            android:text="Last 10 Orders"
+                            android:layout_weight="0"
+                            android:text="Recent 10 Orders"
                             android:textSize="@dimen/_12sdp"
                             android:gravity="center|start"
                             android:textColor="@color/black" />
@@ -484,7 +486,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:text="(based on type of shops)"
+                            android:visibility="invisible"
+                            android:text=""
                             android:textSize="@dimen/_9sdp"
                             android:gravity="center|start"
                             android:textColor="@color/black" />
@@ -714,12 +717,13 @@
                         android:orientation="horizontal">
 
                         <LinearLayout
-                            android:layout_width="@dimen/_130sdp"
+                            android:layout_width="match_parent"
                             android:layout_height="@dimen/_35sdp"
                             android:layout_marginLeft="@dimen/_12sdp"
                             android:layout_marginTop="@dimen/_15sdp"
                             android:background="@drawable/border_background_simple"
                             android:gravity="center"
+                            android:layout_weight="1"
                             android:orientation="horizontal">
 
                             <LinearLayout
@@ -761,7 +765,7 @@
                                 android:background="@drawable/border_background_small_1"
                                 android:backgroundTint="#f3090a"
                                 android:gravity="center"
-                                android:text="0 \n Days ago"
+                                android:text="0 \n Days"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/_10sdp"
                                 android:textStyle="bold" />
@@ -770,12 +774,13 @@
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="@dimen/_130sdp"
+                            android:layout_width="match_parent"
                             android:layout_height="@dimen/_35sdp"
                             android:layout_marginLeft="@dimen/_12sdp"
                             android:layout_marginTop="@dimen/_15sdp"
                             android:background="@drawable/border_background_simple"
                             android:gravity="center"
+                            android:layout_weight="1"
                             android:orientation="horizontal">
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -817,7 +822,7 @@
                                 android:background="@drawable/border_background_small_1"
                                 android:backgroundTint="#051ba2"
                                 android:gravity="center"
-                                android:text="0 \n Days ago"
+                                android:text="0 \n Days"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/_10sdp"
                                 android:textStyle="bold" />
@@ -834,12 +839,71 @@
                         android:orientation="horizontal">
 
                         <LinearLayout
-                            android:layout_width="@dimen/_130sdp"
+                            android:layout_width="match_parent"
                             android:layout_height="@dimen/_35sdp"
                             android:layout_marginLeft="@dimen/_12sdp"
                             android:layout_marginTop="@dimen/_15sdp"
                             android:background="@drawable/border_background_simple"
                             android:gravity="center"
+                            android:layout_weight="1"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1.6"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center"
+                                    android:gravity="start|center"
+                                    android:paddingLeft="@dimen/_8sdp"
+                                    android:text="Last"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/_9sdp"
+                                    android:textStyle="normal" />
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center"
+                                    android:layout_weight="1.6"
+                                    android:gravity="start|center"
+                                    android:paddingLeft="@dimen/_8sdp"
+                                    android:text="Visited date"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/_10sdp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_frag_team_performance_lastcollectionbyago"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="end"
+                                android:layout_weight="1.6"
+                                android:background="@drawable/border_background_small_1"
+                                android:backgroundTint="#0ca485"
+                                android:gravity="center"
+                                android:text="0 \n"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/_10sdp"
+                                android:textStyle="bold" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_35sdp"
+                            android:layout_marginLeft="@dimen/_12sdp"
+                            android:layout_marginTop="@dimen/_15sdp"
+                            android:background="@drawable/border_background_simple"
+                            android:gravity="center"
+                            android:layout_weight="1"
                             android:orientation="horizontal">
 
                             <LinearLayout
@@ -874,63 +938,6 @@
                             </LinearLayout>
 
                             <TextView
-                                android:id="@+id/tv_frag_team_performance_lastcollectionbyago"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="end"
-                                android:layout_weight="1.6"
-                                android:background="@drawable/border_background_small_1"
-                                android:backgroundTint="#0ca485"
-                                android:gravity="center"
-                                android:text="0 \n Days ago"
-                                android:textColor="@color/white"
-                                android:textSize="@dimen/_10sdp"
-                                android:textStyle="bold" />
-
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="@dimen/_130sdp"
-                            android:layout_height="@dimen/_35sdp"
-                            android:layout_marginLeft="@dimen/_12sdp"
-                            android:layout_marginTop="@dimen/_15sdp"
-                            android:background="@drawable/border_background_simple"
-                            android:gravity="center"
-                            android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1.6"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:layout_gravity="center"
-                                    android:gravity="start|center"
-                                    android:paddingLeft="@dimen/_8sdp"
-                                    android:text="Last"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/_9sdp"
-                                    android:textStyle="normal" />
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:layout_gravity="center"
-                                    android:layout_weight="1.6"
-                                    android:gravity="start|center"
-                                    android:paddingLeft="@dimen/_8sdp"
-                                    android:text="Login"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/_10sdp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-
-                            <TextView
                                 android:id="@+id/tv_frag_team_performance_lastloginbyago"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
@@ -939,7 +946,7 @@
                                 android:background="@drawable/border_background_small_1"
                                 android:backgroundTint="#c8810d"
                                 android:gravity="center"
-                                android:text="0 \n Days ago"
+                                android:text="0 \n Days"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/_10sdp"
                                 android:textStyle="bold" />
@@ -961,6 +968,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_5sdp"
+                android:visibility="gone"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="@dimen/_10sdp"
                 app:cardElevation="@dimen/_5sdp">
@@ -973,7 +981,6 @@
                     android:paddingLeft="@dimen/_5sdp"
                     android:paddingTop="@dimen/_5sdp"
                     android:paddingRight="@dimen/_5sdp"
-                    android:visibility="gone"
                     android:paddingBottom="@dimen/_15sdp">
 
                     <LinearLayout
@@ -1009,6 +1016,7 @@
                                 android:background="@drawable/ic_share"
                                 android:backgroundTint="@color/white"
                                 android:padding="@dimen/_5sdp"
+                                android:visibility="gone"
                                 android:scaleType="fitCenter" />
 
                         </androidx.cardview.widget.CardView>
@@ -1019,13 +1027,19 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/frag_team_performance_last20nitvisited_list_rv"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:minHeight="@dimen/_100sdp"
-                        android:scrollbars="vertical"
-                        tools:itemCount="2"
-                        tools:listitem="@layout/row_party_notvisited_list"
+                        android:layout_height="@dimen/_150sdp"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+
+                    <TextView
+                        android:id="@+id/tv_no_party"
+                        android:layout_width="wrap_content"
+                        android:textSize="@dimen/_11sdp"
+                        android:text="No Party Visited"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:visibility="gone"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 
@@ -1207,17 +1221,19 @@
             android:visibility="gone"
             />
 
-        <TextView
-            android:id="@+id/no_data_found_tv_frag_team_performance"
-            android:layout_width="wrap_content"
-            android:gravity="center"
-            android:text="NO Data Found"
-            android:visibility="gone"
-            android:textSize="@dimen/_20sdp"
-            android:textColor="@color/black_50"
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"/>
+
     </FrameLayout>
+
+    <TextView
+        android:id="@+id/no_data_found_tv_frag_team_performance"
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:text="No Data Found"
+        android:visibility="gone"
+        android:textSize="@dimen/_20sdp"
+        android:textColor="@color/black_50"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"/>
 
 
 

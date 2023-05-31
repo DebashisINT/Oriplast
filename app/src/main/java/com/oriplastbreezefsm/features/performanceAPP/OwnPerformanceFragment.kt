@@ -31,31 +31,35 @@ import com.oriplastbreezefsm.app.utils.Toaster
 import com.oriplastbreezefsm.base.presentation.BaseActivity
 import com.oriplastbreezefsm.base.presentation.BaseFragment
 import com.oriplastbreezefsm.features.attendance.api.AttendanceRepositoryProvider
-import com.oriplastbreezefsm.features.attendance.model.AttendanceRequest
-import com.oriplastbreezefsm.features.attendance.model.AttendanceResponse
+import com.oriplastbreezefsm.features.attendance.model.*
 import com.oriplastbreezefsm.features.dashboard.presentation.DashboardActivity
 import com.oriplastbreezefsm.features.nearbyshops.model.ShopListResponse
 import com.oriplastbreezefsm.features.performanceAPP.model.AdapterPartywiseSalesRecyclerView
 import com.oriplastbreezefsm.features.performanceAPP.model.ChartDataModel
 import com.oriplastbreezefsm.features.performanceAPP.model.ChartDataModelNew
-import com.oriplastbreezefsm.features.viewAllOrder.orderOptimized.ProductQtyRateSubmit
 import com.github.aachartmodel.aainfographics.aachartcreator.AAChartView
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfWriter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.customnotification.view.text
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.*
 
 
 /**
- * Created by Saheli on 26-03-2023.
+ * Created by Saheli on 26-03-2023 v 4.0.8 mantis 0025860.
  */
-
+//  Revision Note
+// 1.0 OwnPerformanceFragment AppV 4.1.3 Saheli    28/04/2023 mantis 0025971
+// 2.0 OwnPerformanceFragment AppV 4.1.3 Saheli    02/05/2023 mantis 0025991 Under Activity Ageing, Below changes need to be done
+// 3.0 OwnPerformanceFragment AppV 4.1.3 Suman    22/05/2023 mantis 26188
+// 4.0 OwnPerformanceFragment AppV 4.1.3 Saheli   24/05/2023 0026221
 class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
     private lateinit var mContext: Context
     private lateinit var aaChart: AAChartView
@@ -64,7 +68,9 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
     private lateinit var tv_present_atten: TextView
     private lateinit var tv_absent_atten: TextView
     private lateinit var tv_AttendHeader: TextView
+    private lateinit var tv_AttendHeaderMonth: TextView
     private lateinit var iv_frag_performance_attenshare: ImageView
+    private lateinit var tv_frag_own_perf_mtd_heading_month: TextView
     private lateinit var iv_frag_performance_MTDshare: ImageView
     private lateinit var iv_share_last10: ImageView
     private lateinit var tv_total_ordervalue_frag_own: TextView
@@ -91,7 +97,7 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
     private lateinit var tv_frag_own_performance_loginbyago:TextView
     private lateinit var ll_activityageing_frag_own:LinearLayout
     private lateinit var iv_share_activityageing: ImageView
-    var calendar: Calendar = Calendar.getInstance()
+//    var calendar: Calendar = Calendar.getInstance()
     var inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     var outputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
     private var adapterPartynotVisited20days: AdapterPartyNotVisitRecyclerView? = null
@@ -103,6 +109,10 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
     private lateinit  var tv_sel_party_multiple_sel_own:TextView
     private lateinit var iv_share_partywisesales: ImageView
     private lateinit var ll_party_wise_sales_performance:LinearLayout
+    private lateinit var iv_share_partynotvisitedlast20days: ImageView
+    private lateinit var ll_partynotvisitedlast20_frag_own:LinearLayout
+    private lateinit var tv_no_party:TextView
+
 
 
 
@@ -128,8 +138,10 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
         ll_attend_view = view.findViewById(R.id.ll_attend_view)
         ll_mtd_view = view.findViewById(R.id.ll_mtd_view)
         tv_AttendHeader = view.findViewById(R.id.tv_frag_own_perf_attend_heading)
+        tv_AttendHeaderMonth = view.findViewById(R.id.tv_frag_own_perf_attend_heading_month)
         iv_frag_performance_attenshare = view.findViewById(R.id.iv_frag_performance_attenshare)
         iv_frag_performance_MTDshare = view.findViewById(R.id.iv_frag_performance_MTDshare)
+        tv_frag_own_perf_mtd_heading_month = view.findViewById(R.id.tv_frag_own_perf_mtd_heading_month)
         iv_frag_performance_attenshare.setOnClickListener(this)
         iv_frag_performance_MTDshare.setOnClickListener(this)
         iv_share_last10 =  view.findViewById(R.id.iv_share_last10)
@@ -138,10 +150,8 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
         tv_total_ordervalue_frag_own = view.findViewById(R.id.tv_total_ordervalue_frag_own)
         tv_totalOrdercount_frag_own_performance =
             view.findViewById(R.id.tv_totalOrdercount_frag_own_performance)
-        tv_avg_value_frag_own_performance =
-            view.findViewById(R.id.tv_avg_value_frag_own_performance)
-        tv_avg_orderCount_frag_own_performance =
-            view.findViewById(R.id.tv_avg_orderCount_frag_own_performance)
+        tv_avg_value_frag_own_performance = view.findViewById(R.id.tv_avg_value_frag_own_performance)
+        tv_avg_orderCount_frag_own_performance = view.findViewById(R.id.tv_avg_orderCount_frag_own_performance)
         tv_frag_own_performnace_sel_shopType = view.findViewById(R.id.tv_frag_own_performnace_sel_shopType)
         tv_frag_own_performnace_sel_shopType.setOnClickListener(this)
         loadProgress()
@@ -166,8 +176,8 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
         tv_frag_own_performnace_sel_party.setOnClickListener(this)
         tv_frag_own_performance_lastvisitbyago = view.findViewById(R.id.tv_frag_own_performance_lastvisitbyago)
         tv_frag_own_performance_lastorderbyago =  view.findViewById(R.id.tv_frag_own_performance_lastorderbyago)
-        tv_frag_own_performance_lastcollectionbyago = view.findViewById(R.id.tv_frag_own_performance_lastcollectionbyago)
-        tv_frag_own_performance_loginbyago = view.findViewById(R.id.tv_frag_own_performance_loginbyago)
+        tv_frag_own_performance_lastcollectionbyago = view.findViewById(R.id.tv_frag_own_performance_lastcollectionbyago)// last visited date
+        tv_frag_own_performance_loginbyago = view.findViewById(R.id.tv_frag_own_performance_loginbyago)// collection
         ll_activityageing_frag_own = view.findViewById(R.id.ll_activityageing_frag_own)
 
         frag_own_performance_last20nitvisited_list_rv = view.findViewById(R.id.frag_own_performance_last20nitvisited_list_rv)
@@ -177,18 +187,23 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
         iv_share_partywisesales = view.findViewById(R.id.iv_share_partywisesales)
         iv_share_partywisesales.setOnClickListener(this)
         ll_party_wise_sales_performance = view.findViewById(R.id.ll_party_wise_sales_performance)
+        iv_share_partynotvisitedlast20days = view.findViewById(R.id.iv_share_partynotvisitedlast20days)
+        iv_share_partynotvisitedlast20days.setOnClickListener(this)
+        ll_partynotvisitedlast20_frag_own = view.findViewById(R.id.ll_partynotvisitedlast20_frag_own)
+        tv_no_party = view.findViewById(R.id.tv_no_party)
         last20NotVisitedList()
 
-        calendar.add(Calendar.MONTH, -1)
+        var calendar1: Calendar = Calendar.getInstance()
+        calendar1.add(Calendar.MONTH, -1)
         val sdf = SimpleDateFormat("MMM")
-        val lastMonthDate: String = sdf.format(calendar.time)
-        val daysInMonth: Int = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        calendar.setTime(sdf.parse(lastMonthDate))
-        calendar.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR))
+        val lastMonthDate: String = sdf.format(calendar1.time)
+        val daysInMonth: Int = calendar1.getActualMaximum(Calendar.DAY_OF_MONTH)
+        calendar1.setTime(sdf.parse(lastMonthDate))
+        calendar1.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR))
         val sdf1 = SimpleDateFormat("yyyy-MM-dd")
-        val firstDate = sdf1.format(calendar.time)
-        calendar[Calendar.DAY_OF_MONTH] = daysInMonth
-        val lastDate = sdf1.format(calendar.time)
+        val firstDate = sdf1.format(calendar1.time)
+        calendar1[Calendar.DAY_OF_MONTH] = daysInMonth
+        val lastDate = sdf1.format(calendar1.time)
         println("Month " + lastMonthDate)
         println("month in days " + daysInMonth)
         println("1st Date $lastMonthDate month " + firstDate)
@@ -201,12 +216,19 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
         callAttendanceListApi(attendanceReq, firstDate, lastDate, daysInMonth)
 
 
+        //Begin 3.0 OwnPerformanceFragment AppV 4.1.3 Suman    22/05/2023 mantis 26188
+        val now: LocalDate = LocalDate.now()
+        val earlier: LocalDate = now.minusMonths(1)
+        tv_AttendHeaderMonth.text= " (Last Month - ${earlier.getMonth()})"
+        //End 3.0 OwnPerformanceFragment AppV 4.1.3 Suman    22/05/2023 mantis 26188
+
+
         /*MTD Calculation*/
         val currentDate = Date()
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")
         val formattedDate = dateFormat.format(currentDate)
         println(formattedDate)
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+//        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
         Locale.setDefault(Locale.US)
         val cal = Calendar.getInstance()
         val year = cal[Calendar.YEAR]
@@ -224,41 +246,42 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
         val firstDateOfMonth = calendar.time
         val outputDate = dateFormat1.format(firstDateOfMonth)
         println("First date of month: $outputDate")
+
+        //Begin 3.0 OwnPerformanceFragment AppV 4.1.3 Suman    22/05/2023 mantis 26188
+        tv_frag_own_perf_mtd_heading_month.text = " (Month To Date ${AppUtils.getFirstDateOfThisMonth_DD_MMM_YY()} TO ${AppUtils.getCurrentDate_DD_MMM_YYYY()})"
+        //End of 3.0 OwnPerformanceFragment AppV 4.1.3 Suman    22/05/2023 mantis 26188
+
         try {
             val totalOrderValueMTDwise = AppDatabase.getDBInstance()!!.orderDetailsListDao().getOrderValueMTD(outputDate, formattedDate1)
             val totalOrderCountMTDwise = AppDatabase.getDBInstance()!!.orderDetailsListDao().getOrderCountMTD(outputDate, formattedDate1)
-            val shopDetailsCount = AppDatabase.getDBInstance()!!.addShopEntryDao().countUsers()
+//            val shopDetailsCount = AppDatabase.getDBInstance()!!.addShopEntryDao().countUsers()
+            val totalMTDDates = AppUtils.getCurrentDate_DD_MM_YYYY().split("-").get(0)
+
             println("Total Order Value+count MTDwise: $totalOrderValueMTDwise $totalOrderCountMTDwise")
-            tv_total_ordervalue_frag_own.setText(
-                "Total Order Value \n" + String.format(
-                    "%.2f",
-                    totalOrderValueMTDwise.toDouble()
-                )
-            )
+            tv_total_ordervalue_frag_own.setText("Total Order Value \n" + String.format("%.2f", totalOrderValueMTDwise.toDouble()))
             tv_totalOrdercount_frag_own_performance.setText("Total Order count \n" + totalOrderCountMTDwise)
-            tv_avg_value_frag_own_performance.setText(
-                "Avg Order Value \n" + String.format(
-                    "%.2f",
-                    (totalOrderValueMTDwise.toDouble() / totalOrderCountMTDwise.toDouble())
-                )
-            )
-            val orderavgCount = String.format(
-                "%.2f",
-                ((totalOrderValueMTDwise.toDouble() / totalOrderCountMTDwise.toDouble()))
-            )
-            tv_avg_orderCount_frag_own_performance.setText(
-                "Avg Order Count \n" + String.format(
+            tv_avg_value_frag_own_performance.setText("Avg Order Value \n" + String.format("%.2f", (totalOrderValueMTDwise.toDouble() / totalOrderCountMTDwise.toDouble())))
+            val orderavgCount = String.format("%.2f", ((totalOrderValueMTDwise.toDouble() / totalOrderCountMTDwise.toDouble())))
+            /*tv_avg_orderCount_frag_own_performance.setText(
+                "Avg Order Count\n" +
+                    String.format(
                     "%.2f",
                     ((orderavgCount.toDouble() / shopDetailsCount))
                 )
+            )*/
+            val averageOrderCount = (totalOrderCountMTDwise.toDouble() / totalMTDDates.toDouble()).toInt()
+
+            tv_avg_orderCount_frag_own_performance.setText(
+                "Avg Order Count\n" + averageOrderCount
+
             )
-            val avgCount = String.format("%.2f", ((orderavgCount.toDouble() / shopDetailsCount)))
+//            val avgCount = String.format("%.2f", ((orderavgCount.toDouble() / totalMTDDates.toDouble()))).toInt()
             aaChart1.aa_drawChartWithChartModel(
                 ChartDataModelNew.configurePolarColumnChart(
                     totalOrderValueMTDwise.toDouble(),
                     totalOrderCountMTDwise.toDouble(),
                     orderavgCount.toDouble(),
-                    avgCount.toDouble()
+                    averageOrderCount
                 )
             )
             loadNotProgress()
@@ -268,6 +291,16 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
             tv_totalOrdercount_frag_own_performance.setText("Total Order count \n" + 0)
             tv_avg_value_frag_own_performance.setText("Avg Order Value \n" + 0)
             tv_avg_orderCount_frag_own_performance.setText("Avg Order Count \n" + 0)
+            // start 1.0 OwnPerformanceFragment AppV 4.1.3 Saheli    28/04/2023 mantis 0025971
+            aaChart1.aa_drawChartWithChartModel(
+                ChartDataModelNew.configurePolarColumnChart(
+                    0.0,
+                    0.0,
+                    0.0,
+                    0
+                )
+            )
+            // end  1.0 OwnPerformanceFragment AppV 4.1.3 Saheli    28/04/2023 mantis 0025971
             loadNotProgress()
         }
 
@@ -353,9 +386,9 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
             document.open()
             var font: Font = Font(Font.FontFamily.HELVETICA, 10f, Font.BOLD)
             val projectName = Paragraph(ReportName + ":", font)
-            projectName.alignment = Element.ALIGN_LEFT
+            projectName.alignment = Element.ALIGN_CENTER
             projectName.spacingAfter = 5f
-            document.add(projectName)
+//            document.add(projectName)
 
             if (ReportName.contains("Attendance REPORT")) {
                 ll_attend_view.isDrawingCacheEnabled = true
@@ -398,7 +431,28 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
                 }
                 document.add(img)
 
-            }else if(ReportName.contains("Last 10 Orders")){
+            }else if(ReportName.contains("Party Not Visited Last 20Days")){
+                ll_partynotvisitedlast20_frag_own.isDrawingCacheEnabled = true
+                var bitM: Bitmap = Bitmap.createBitmap(ll_partynotvisitedlast20_frag_own.getDrawingCache())
+                ll_partynotvisitedlast20_frag_own.isDrawingCacheEnabled = false
+                val bitmapPrint = Bitmap.createScaledBitmap(bitM, bitM.width, bitM.height, false)
+                val stream = ByteArrayOutputStream()
+                bitmapPrint.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                var img: Image? = null
+                val byteArray: ByteArray = stream.toByteArray()
+                try {
+                    img = Image.getInstance(byteArray)
+                    img.scaleToFit(190f, 90f)
+                    img.scalePercent(20f)
+                    img.alignment = Image.ALIGN_LEFT
+                } catch (e: BadElementException) {
+                    e.printStackTrace()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+                document.add(img)
+            }
+            else if(ReportName.contains("Recent 10 Orders")){
                 ll_last10order_frag_own.isDrawingCacheEnabled = true
                 var bitM: Bitmap = Bitmap.createBitmap(ll_last10order_frag_own.getDrawingCache())
                 ll_last10order_frag_own.isDrawingCacheEnabled = false
@@ -521,7 +575,7 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
                 loadShopTypeList()
             }
             R.id.iv_share_last10 ->{
-                ShareDataAsPdf("Last 10 Orders")
+                ShareDataAsPdf("Recent 10 Orders")
             }
             R.id.tv_frag_own_performnace_sel_party ->{
                 loadPartyList()
@@ -535,6 +589,9 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
             }
             R.id.iv_share_partywisesales-> {
                 ShareDataAsPdf("PartyWise Sales")
+            }
+            R.id.iv_share_partynotvisitedlast20days->{
+                ShareDataAsPdf("Party Not Visited Last 20Days")
             }
         }
     }
@@ -567,7 +624,11 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
     }
 
     private fun loadShopTypeList() {
-        val list = AppDatabase.getDBInstance()?.shopTypeDao()?.getAll()
+        var mOrderValue: Double = 0.0
+        var mOrderCount: Double = 0.0
+        // 4.0 OwnPerformanceFragment AppV 4.1.3 Saheli   24/05/2023 0026221
+        val list = AppDatabase.getDBInstance()?.shopTypeDao()?.getOrderByalphabeticallyAll()
+        // 4.0 OwnPerformanceFragment AppV 4.1.3 Saheli   24/05/2023 0026221
         if(list!!.size>0){
             shopType_list = list as ArrayList<ShopTypeEntity>
             ShopTypeListDialog.newInstance("Select shop Type", shopType_list!!) {
@@ -575,8 +636,23 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
                 sel_shopTypeID = it.shoptype_id!!
                 sel_shopTypeName = it.shoptype_name!!
                 val totalOrderVShopTypWise = AppDatabase.getDBInstance()!!.orderDetailsListDao().getTotalOrdershopTypewise(sel_shopTypeID)
+              /*  try {
+                    for (i in totalOrderVShopTypWise) {
+                        mOrderValue += i.amount!!.toDouble()
+                        mOrderCount++
+                    }
+                    tv_total_ordervalueshopTypewise_frag_own.setText("Total Order value \n"+String.format("%.2f",mOrderValue))
+                    tv_totalOrdercount_shoptypewise_frag_own_performance.setText("Total Order Count \n"+String.format("%.2f",mOrderCount))
+                    tv_avgOrderValueshopTypewise_frag_own_performance.setText("Avg Order Value \n" + String.format("%.2f", (mOrderValue / mOrderCount)))
+                }catch (ex:Exception){
+                    ex.printStackTrace()
+                    tv_total_ordervalueshopTypewise_frag_own.setText("Total Order value \n"+0)
+                    tv_totalOrdercount_shoptypewise_frag_own_performance.setText("Total Order Count \n"+0)
+                    tv_avgOrderValueshopTypewise_frag_own_performance.setText("Avg Order Value \n" +0)
+                }*/
+
                 val totalOrderCountShopTypWise = AppDatabase.getDBInstance()!!.orderDetailsListDao().getOrderCountshopTypewise(sel_shopTypeID)
-                try{
+               try{
                     if(totalOrderVShopTypWise == null){
                         tv_total_ordervalueshopTypewise_frag_own.setText("Total Order value \n"+0)
                         tv_totalOrdercount_shoptypewise_frag_own_performance.setText("Total Order Count \n"+0)
@@ -598,13 +674,16 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
 
     private fun loadPartyList() {
         try{
-            mshoplist = AppDatabase.getDBInstance()?.addShopEntryDao()?.all as ArrayList<AddShopDBModelEntity>?
+            mshoplist = AppDatabase.getDBInstance()?.addShopEntryDao()?.getOrderByalphabeticallyAll() as ArrayList<AddShopDBModelEntity>?
             ShopListDatamodelDialog.newInstance("Select party", mshoplist!!) {
                 tv_frag_own_performnace_sel_party.text = it.shopName
                 var mshopId = it.shop_id
                 var lastVisitedDate = it.lastVisitedDate
                 val lastVisitAge = AppUtils.getDayFromSubtractDates(AppUtils.getLongTimeStampFromDate2(lastVisitedDate),AppUtils.convertDateStringToLong(AppUtils.getCurrentDateForShopActi()))
-                tv_frag_own_performance_lastvisitbyago.text = "$lastVisitAge \n Days Ago"
+//                tv_frag_own_performance_lastvisitbyago.text = "$lastVisitAge \n Days Ago"
+                // 2.0 OwnPerformanceFragment AppV 4.1.3 Saheli    02/05/2023 mantis 0025991 Under Activity Ageing, Below changes need to be done
+                tv_frag_own_performance_lastvisitbyago.text = "$lastVisitAge \n Days"
+                // 2.0rev end mantis 0025991 ago remove
                 var lastOrderDate = AppDatabase.getDBInstance()!!.orderDetailsListDao().getLastOrderDate(mshopId)
                 try {
                     var date_str = lastOrderDate.split("T")[0]
@@ -613,26 +692,41 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
                     val newFormat = SimpleDateFormat("dd-MMM-yy")
                     val formattedDate = newFormat.format(date)
                     var lastOrder = AppUtils.getDayFromSubtractDates(AppUtils.getLongTimeStampFromDate2(formattedDate),AppUtils.convertDateStringToLong(AppUtils.getCurrentDateForShopActi()))
-                    tv_frag_own_performance_lastorderbyago.text = "$lastOrder \n Days Ago"
+                  //  tv_frag_own_performance_lastorderbyago.text = "$lastOrder \n Days Ago"
+                    // 2.0 OwnPerformanceFragment AppV 4.1.3 Saheli    02/05/2023 mantis 0025991 Under Activity Ageing, Below changes need to be done
+                    tv_frag_own_performance_lastorderbyago.text = "$lastOrder \n Days"
+                    // 2.0 rev end mantis 0025991 ago remove
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    tv_frag_own_performance_lastorderbyago.text = "0 \n Days Ago"
+                    tv_frag_own_performance_lastorderbyago.text = "0 \n Days"
                 }
                 try {
                     var lastcollection = AppDatabase.getDBInstance()!!.collectionDetailsDao().getLastCollectionDate(mshopId)
                     var lastcollDatebyAgo = AppUtils.getDayFromSubtractDates(AppUtils.getLongTimeStampFromDate2(lastcollection),AppUtils.convertDateStringToLong(AppUtils.getCurrentDateForShopActi()))
-                    tv_frag_own_performance_lastcollectionbyago.text = "$lastcollDatebyAgo \n Days Ago"
+//                    tv_frag_own_performance_loginbyago.text = "$lastcollDatebyAgo \n Days Ago"
+                    // 2.0 OwnPerformanceFragment AppV 4.1.3 Saheli    02/05/2023 mantis 0025991 Under Activity Ageing, Below changes need to be done
+                    tv_frag_own_performance_loginbyago.text = "$lastcollDatebyAgo \n Days"
+                    // 2.0 rev end mantis 0025991 ago remove
                 }catch (e: Exception) {
                     e.printStackTrace()
-                    tv_frag_own_performance_lastcollectionbyago.text = "0 \n Days Ago"
+//                    tv_frag_own_performance_loginbyago.text = "0 \n Days Ago"
+                    // 2.0 OwnPerformanceFragment AppV 4.1.3 Saheli    02/05/2023 mantis 0025991 Under Activity Ageing, Below changes need to be done
+                    tv_frag_own_performance_loginbyago.text = "0 \n Days"
+                    // 2.0 rev end mantis 0025991 ago remove
                 }
                 try{
-                    var lastlogindayAgo = AppDatabase.getDBInstance()!!.userAttendanceDataDao().getLastLoginDate()
+                  /*  var lastlogindayAgo = AppDatabase.getDBInstance()!!.userAttendanceDataDao().getLastLoginDate()
                     var lastlogin = AppUtils.getDayFromSubtractDates(AppUtils.getLongTimeStampFromDate2(lastlogindayAgo),AppUtils.convertDateStringToLong(AppUtils.getCurrentDateForShopActi()))
-                    tv_frag_own_performance_loginbyago.text = "$lastlogin \n Days Ago"
+                    tv_frag_own_performance_loginbyago.text = "$lastlogin \n Days Ago"*/
+                    // 2.0 OwnPerformanceFragment AppV 4.1.3 Saheli    02/05/2023 mantis 0025991 Under Activity Ageing, Below changes need to be done
+                    tv_frag_own_performance_lastcollectionbyago.text = "$lastVisitedDate \n"
+                    // 2.0 rev end mantis 0025991 ago remove
                 }catch (e: Exception) {
                     e.printStackTrace()
-                    tv_frag_own_performance_loginbyago.text = "0 \n Days Ago"
+                    // 2.0 OwnPerformanceFragment AppV 4.1.3 Saheli    02/05/2023 mantis 0025991 Under Activity Ageing, Below changes need to be done
+                    tv_frag_own_performance_lastcollectionbyago.text = "0 \n Days"
+                    // 2.0 rev end mantis 0025991 ago remove
+//                    tv_frag_own_performance_loginbyago.text = "0 \n Days Ago"
                 }
 
 
@@ -644,22 +738,68 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
         }
 
     }
-
     private fun last20NotVisitedList(){
+        var calendar: Calendar = Calendar.getInstance()
         var dateFormat1 = SimpleDateFormat("yyyy-MM-dd")
         calendar.add(Calendar.DAY_OF_YEAR, -20)
         val date20DaysAgo = calendar.time
         println("last 20 days ago"+ dateFormat1.format(date20DaysAgo))
-
-//        adapterPartynotVisited20days=AdapterPartyNotVisitRecyclerView(mContext,"")
-//        frag_own_performance_last20nitvisited_list_rv.adapter = adapterPartynotVisited20days
+        val fromDTLast20Ago = dateFormat1.format(date20DaysAgo)
+        apicallForPartyNotVisited(fromDTLast20Ago,AppUtils.getCurrentDateyymmdd())
     }
+
+    private fun apicallForPartyNotVisited(fromdate: Any, todate: Any) {
+        val inputReq = InputRequest()
+        inputReq.user_id = Pref.user_id
+        inputReq.session_token = Pref.session_token
+        inputReq.from_date = fromdate.toString()
+        inputReq.to_date = todate.toString()
+        val repository = AttendanceRepositoryProvider.provideAttendanceRepository()
+        loadProgress()
+        BaseActivity.compositeDisposable.add(
+            repository.getNotVisitedPartyList(inputReq)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({ result ->
+                    loadNotProgress()
+                    val obj = result as OutputResponse
+                    if (obj.status == NetworkConstant.SUCCESS) {
+                        if(obj.last_visit_order_list!!.size>0){
+                            frag_own_performance_last20nitvisited_list_rv.visibility = View.VISIBLE
+                            tv_no_party.visibility = View.GONE
+                            prepareAdpater(obj)
+
+                        }else{
+                            (mContext as DashboardActivity).showSnackMessage("No data found.")
+                        }
+                    }else if(obj.status ==NetworkConstant.NO_DATA){
+                        (mContext as DashboardActivity).showSnackMessage("No data found.")
+                        frag_own_performance_last20nitvisited_list_rv.visibility = View.GONE
+                        tv_no_party.visibility = View.VISIBLE
+                    }
+                }, { error ->
+                    loadNotProgress()
+                    error.printStackTrace()
+                    (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
+                })
+        )
+    }
+
+    private fun prepareAdpater(obj: OutputResponse) {
+        // start 1.0 OwnPerformanceFragment AppV 4.1.3 Saheli    28/04/2023 mantis 0025971
+//        adapterPartynotVisited20days=AdapterPartyNotVisitRecyclerView(mContext,obj.last_visit_order_list!!.take(5) as ArrayList<last_visit_order_list>)
+        adapterPartynotVisited20days=AdapterPartyNotVisitRecyclerView(mContext,obj.last_visit_order_list!!)
+        // end 1.0 OwnPerformanceFragment AppV 4.1.3 Saheli    28/04/2023 mantis 0025971
+        frag_own_performance_last20nitvisited_list_rv.adapter = adapterPartynotVisited20days
+
+    }
+
 
     private fun partyWiseSalesOrder(){
         println("tag_shop partyWiseSalesOrder call")
         var mshopId:String=""
         var mshopName:String=""
-        mshoplist = AppDatabase.getDBInstance()?.addShopEntryDao()?.all as ArrayList<AddShopDBModelEntity>?
+        mshoplist = AppDatabase.getDBInstance()?.addShopEntryDao()?.getOrderByalphabeticallyAll() as ArrayList<AddShopDBModelEntity>?
 
         var mShopFilterList :ArrayList<PartyWiseDataModel>? = ArrayList()
         var listwiseData: PartyWiseDataModel
@@ -669,11 +809,15 @@ class OwnPerformanceFragment: BaseFragment(), View.OnClickListener {
                 for (i in 0..list.size-1) {
                     mshopId = list.get(i).shop_id!!
                         try{
-                             listwiseData = AppDatabase.getDBInstance()!!.orderDetailsListDao().getTotalShopNTwiseSalesValues(mshopId!!)
-                            println("data class "+listwiseData)
-                            mShopFilterList!!.add(listwiseData)
-                            println("data class adapter size"+mShopFilterList.size)
-                            println("data class adapter"+mShopFilterList)
+                            //val haveAnyOrderShopId = AppDatabase.getDBInstance()!!.orderDetailsListDao().getOrderAmtShop(mshopId)
+                            //if(haveAnyOrderShopId.size>0){
+                                listwiseData = AppDatabase.getDBInstance()!!.orderDetailsListDao().getTotalShopNTwiseSalesValues(mshopId!!)
+                                println("data class "+listwiseData)
+                                mShopFilterList!!.add(listwiseData)
+                                println("data class adapter size"+mShopFilterList.size)
+                                println("data class adapter"+mShopFilterList)
+                            //}
+
                         }catch(ex:Exception){
                             ex.printStackTrace()
                         }

@@ -16,10 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.oriplastbreezefsm.R
 import com.oriplastbreezefsm.features.nearbyshops.model.ShopData
-import com.oriplastbreezefsm.features.photoReg.adapter.AdapterUserTestList
+import com.oriplastbreezefsm.features.performanceAPP.model.AdapterUserTestList
 import com.oriplastbreezefsm.widgets.AppCustomEditText
 import com.oriplastbreezefsm.widgets.AppCustomTextView
 
+/**
+ * Created by Saheli on 18-04-2023 v 4.0.8 mantis 0025860.
+ */
 class PartySaleWiseListApiDatamodelDialog: DialogFragment() {
 
     private lateinit var header: AppCustomTextView

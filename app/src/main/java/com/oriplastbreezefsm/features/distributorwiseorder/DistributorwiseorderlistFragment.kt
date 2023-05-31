@@ -316,7 +316,7 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
         var fileName = "FTS" + "_" + objData.distName.uppercase()+random.nextInt(99 - 10) + 10
         fileName = fileName.replace("/", "_")
 
-        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/oriplastApp/DISTRIBUTORWISEORDERDETALIS/"
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/oriplastbreezefsmApp/DISTRIBUTORWISEORDERDETALIS/"
 
         val dir = File(path)
         if (!dir.exists()) {

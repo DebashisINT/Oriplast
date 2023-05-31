@@ -19,6 +19,9 @@ import com.oriplastbreezefsm.features.nearbyshops.model.ShopTypeDataModel
 import com.oriplastbreezefsm.widgets.AppCustomEditText
 import com.oriplastbreezefsm.widgets.AppCustomTextView
 
+/**
+ * Created by Saheli on 13-03-2023 v 4.0.8 mantis 0025860.
+ */
 class ShopTypeListDatamodelDialog: DialogFragment() {
 
     private lateinit var header: AppCustomTextView

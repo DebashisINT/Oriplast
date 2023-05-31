@@ -48,7 +48,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.system.measureTimeMillis
 
-// 4.0 OrderProductListFrag AppV 4.0.8 Suman    12/04/2023 Adapter list generation update
+// 4.0 OrderProductListFrag AppV 4.0.8 Suman    12/04/2023 Adapter list generation update 0025876
 
 class OrderProductListFrag : BaseFragment(), View.OnClickListener {
 
@@ -384,7 +384,7 @@ class OrderProductListFrag : BaseFragment(), View.OnClickListener {
                 submitedQty = "-1"
                 submitedRate = productL.get(i).rate
 
-                // 4.0 OrderProductListFrag AppV 4.0.8 Suman    12/04/2023 Adapter list generation update
+                // 4.0 OrderProductListFrag AppV 4.0.8 Suman    12/04/2023 Adapter list generation update 0025876
                 /*if(Pref.isRateOnline){
                     if((AppDatabase.getDBInstance()?.productOnlineRateTempDao()?.getAll() as ArrayList<ProductOnlineRateTempEntity>).size>0){
                         var secObj = AppDatabase.getDBInstance()?.productOnlineRateTempDao()?.getObjByProductID(productL.get(i).product_id!!)?.firstOrNull()
