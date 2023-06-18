@@ -538,6 +538,7 @@ class SplashActivity : BaseActivity(), GpsStatusDetector.GpsStatusDetectorCallBa
                 isLoginLoaded = true
 
                 // 2.0 SplashActivity AppV 4.0.7 Suman    21/03/2023 Location rectification for previous location 25760
+                println("loc_fetch_tag splash begin")
                 progress_wheel.spin()
                 try{
                     SingleShotLocationProvider.requestSingleUpdate(this,
@@ -552,6 +553,7 @@ class SplashActivity : BaseActivity(), GpsStatusDetector.GpsStatusDetectorCallBa
                             }
 
                             override fun onNewLocationAvailable(location: Location) {
+                                println("loc_fetch_tag splash end")
                                 Pref.latitude = location.latitude.toString()
                                 Pref.longitude = location.longitude.toString()
                                 Timber.d("Splash onNewLocationAvailable ${Pref.latitude} ${Pref.longitude}")

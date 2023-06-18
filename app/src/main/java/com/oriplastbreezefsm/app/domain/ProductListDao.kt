@@ -18,7 +18,8 @@ interface ProductListDao {
     @Query("SELECT * FROM " + AppConstant.PRODUCT_LIST_TABLE +" where id IN (SELECT id FROM product_list group by brand)")
     fun getUniqueBrandList(): List<ProductListEntity>
 
-
+    @Query("SELECT product_name FROM " + AppConstant.PRODUCT_LIST_TABLE)
+    fun getNameAll(): List<String>
 
     ////nw code new
     @Query("select PL.id as product_id,PL.product_name,PL.brand_id,PL.brand,PL.category_id,PL.category,PL.watt_id,PL.watt,PL.product_mrp_show," +

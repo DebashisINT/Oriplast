@@ -4,6 +4,11 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.oriplastbreezefsm.app.AppConstant
+import com.oriplastbreezefsm.features.marketAssist.OrderDtlsLast30Days
+import com.oriplastbreezefsm.features.marketAssist.SuggestiveProduct
+import com.oriplastbreezefsm.features.performanceAPP.NoOrderTakenList
+import com.oriplastbreezefsm.features.performanceAPP.NoOrderTakenShop
+import com.oriplastbreezefsm.features.performanceAPP.NoProductSoldShop
 import com.oriplastbreezefsm.features.performanceAPP.PartyWiseDataModel
 
 
@@ -98,8 +103,63 @@ interface OrderDetailsListDao {
     @Query("select sum(amount) as toltaOrdV from order_details_list where shop_id=:shop_id")
     fun getTotalSalesValues(shop_id: String): String
 
-    @Query("select sum(amount) as total_sales_value,(select shop_name from shop_detail where shop_id=:shop_id)  as shop_name ,(select shoptype_name from shop_type_list where shoptype_id =(select type from shop_detail where shop_id=:shop_id)) as shop_type_name from order_details_list where shop_id=:shop_id")
+//    @Query("select sum(amount) as total_sales_value,(select shop_name from shop_detail where shop_id=:shop_id)  as shop_name ,(select shoptype_name from shop_type_list where shoptype_id =(select type from shop_detail where shop_id=:shop_id)) as shop_type_name from order_details_list where shop_id=:shop_id")
+//    fun getTotalShopNTwiseSalesValues(shop_id: String): PartyWiseDataModel
+
+    @Query("select sum(amount) as total_sales_value,(select shop_name from shop_detail where shop_id=:shop_id)  as shop_name,'' as shop_type_name from order_details_list where shop_id=:shop_id")
     fun getTotalShopNTwiseSalesValues(shop_id: String): PartyWiseDataModel
 
+    @Query("select (sum(amount)/count(*)) as avgOrdVal from order_details_list where shop_id=:shop_id")
+    fun getAvgOrderValue(shop_id: String): Double
+
+    @Query("select product_id,product_name,qty,rate,total_price from order_product_list where order_id  \n" +
+            "in (select order_id from order_details_list where shop_id=:shop_id order by id desc limit 30)")
+    fun getSuggestProduct(shop_id: String): List<SuggestiveProduct>
+
+
+
+    @Query("select product_id,product_name,qty,rate,total_price from order_product_list where order_id  \n" +
+            "in (select order_id from order_details_list where shop_id=:shop_id order by id)")
+    fun getSuggestProductAll(shop_id: String): List<SuggestiveProduct>
+
+    @Query("select product_id,product_name,qty,rate,total_price from order_product_list where order_id  \n" +
+            "in (select order_id from order_details_list where shop_id=:shop_id order by id desc limit 30)")
+    fun getSuggestProduct30Days(shop_id: String): List<SuggestiveProduct>
+
+    @Query("select amount from order_details_list where shop_id=:shop_id order by id desc limit 30")
+    fun getLast30DaysOrderAmt(shop_id: String): List<String>
+
+    @Query("select B.product_id,B.product_name,B.qty,B.rate,B.total_price,date,A.order_id from order_details_list as A \n" +
+            "inner join order_product_list as B on A.order_id = B.order_id where A.shop_id =:shop_id \n" +
+            "order by A.id desc limit 30\n")
+    fun getLast30DaysOrderDtls(shop_id: String): List<OrderDtlsLast30Days>
+
+    @Query("select shop_id,shop_name,owner_contact_number,address,case when owner_name IS NULL then '' else owner_name END as owner_name,type from shop_detail where shop_id not in\n" +
+            "( select shopid from shop_activity where date(visited_date) between :dateOf3monthago and :currentDate ) and isOwnshop = 1")
+    fun getShopNotVisited30DaysDtls(dateOf3monthago: String,currentDate:String): List<NoOrderTakenShop>
+
+    @Query("select shop_id,shop_name,owner_contact_number,address,case when owner_name IS NULL then '' else owner_name END as owner_name,type from shop_detail where shop_id not in\n" +
+            "( select shop_id from collection_list where date between :dateOf3monthago and :currentDate)and isOwnshop = 1")
+    fun getShopNotCollection30DaysDtls(dateOf3monthago: String,currentDate:String): List<NoOrderTakenShop>
+
+
+    @Query("select shop_id,shop_name,owner_contact_number,address,case when owner_name IS NULL then '' else owner_name END as owner_name,type from shop_detail where shop_id not in (\n" +
+            "select shop_id from order_details_list where date(date) between :dateOf3monthago and :currentDate \n" +
+            ") and isOwnshop = 1")
+    fun getNoOrderTaken(dateOf3monthago: String,currentDate:String): List<NoOrderTakenShop>
+
+
+    @Query("select shop_id,shop_name,owner_contact_number,address,case when owner_name IS NULL then '' else owner_name END as owner_name,type, JULIANDAY(date())- JULIANDAY(added_date) as age_since_party_creation_count from shop_detail where shop_id not in (\n" +
+            "select shop_id from order_details_list \n" +
+            ") and isOwnshop = 1 order by age_since_party_creation_count")
+    fun getNoOrderTakeList(): List<NoOrderTakenList>
+
+
+    @Query("select product_name from product_list where id not in (\n" +
+            "select DISTINCT(product_id) from order_product_list where order_id in \n" +
+            "(\n" +
+            "select order_id from order_details_list where date(date) between :dateOf3monthago and :currentDate \n" +
+            "))")
+    fun getProductNotsell(dateOf3monthago: String,currentDate:String): List<NoProductSoldShop>
 
 }

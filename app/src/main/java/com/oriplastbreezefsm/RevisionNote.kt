@@ -68,4 +68,8 @@ class RevisionNote {
     // 14.0  DashboardFragment AppV 4.0.8 Suman    19/05/2023 26163
     // 16.0  LoginActivity AppV 4.1.3 Suman    19/05/2023  26163
 // Rev 9.0 AddAttendanceFragment AppV 4.1.3 Suman    20/05/2023 beat flow updation 26163
+
+    //  <!-- Rev 1.0 security config Suman 30-05-2023 mantis id 26261  >-->
+
+    // 2.0 AverageShopListAdapter mantis 26346: Suman 15-06-2023 Current Stock visibility updation
 }

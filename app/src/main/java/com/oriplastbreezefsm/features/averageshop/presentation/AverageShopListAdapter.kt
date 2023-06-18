@@ -62,6 +62,7 @@ import java.util.*
  */
 // revision Note
 // 1.0 AverageShopListAdapter mantis 0026066: saheli 09-05-2023 Total Visit Tab design issue fixing
+// 2.0 AverageShopListAdapter mantis 26346: Suman 15-06-2023 Current Stock visibility updation
 class AverageShopListAdapter(context: Context, userLocationDataEntity: List<ShopActivityEntity>, val listener: AverageShopListClickListener) : RecyclerView.Adapter<AverageShopListAdapter.MyViewHolder>() {
     private val layoutInflater: LayoutInflater
     private var context: Context
@@ -432,10 +433,19 @@ class AverageShopListAdapter(context: Context, userLocationDataEntity: List<Shop
                         itemView.current_stock_view.visibility=View.VISIBLE
                     }else{
                         //if(shop?.type?.toInt() == 1 || shop?.type?.toInt() == 3){
-                        if(currentViewSt==1){
+                        //begin 2.0 AverageShopListAdapter mantis 26346: Suman 15-06-2023 Current Stock visibility updation
+                        /*if(currentViewSt==1){
                             itemView.ll_current_stock.visibility=View.VISIBLE
                             itemView.current_stock_view.visibility=View.VISIBLE
+                        }*/
+                        if(currentViewSt==2 || currentViewSt==4){
+                            itemView.ll_current_stock.visibility=View.VISIBLE
+                            itemView.current_stock_view.visibility=View.VISIBLE
+                        }else{
+                            itemView.ll_current_stock.visibility=View.GONE
+                            itemView.current_stock_view.visibility=View.GONE
                         }
+                        //end of  2.0 AverageShopListAdapter mantis 26346: Suman 15-06-2023 Current Stock visibility updation
                     }
                 }
                 if(AppUtils.getSharedPreferencesIscompetitorStockRequired(context)){
