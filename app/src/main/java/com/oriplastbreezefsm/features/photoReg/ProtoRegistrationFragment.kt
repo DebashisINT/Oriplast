@@ -17,8 +17,12 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.os.*
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
@@ -39,8 +43,18 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.oriplastbreezefsm.MySingleton
 import com.oriplastbreezefsm.R
-import com.oriplastbreezefsm.app.*
+import com.oriplastbreezefsm.app.AppDatabase
+import com.oriplastbreezefsm.app.MaterialSearchView
+import com.oriplastbreezefsm.app.NetworkConstant
+import com.oriplastbreezefsm.app.NewFileUtils
+import com.oriplastbreezefsm.app.Pref
+import com.oriplastbreezefsm.app.SearchListener
+import com.oriplastbreezefsm.app.domain.VisitRevisitWhatsappStatus
 import com.oriplastbreezefsm.app.types.FragType
 import com.oriplastbreezefsm.app.uiaction.IntentActionable
 import com.oriplastbreezefsm.app.utils.AppUtils
@@ -55,7 +69,13 @@ import com.oriplastbreezefsm.features.myjobs.model.WIPImageSubmit
 import com.oriplastbreezefsm.features.photoReg.adapter.AdapterUserList
 import com.oriplastbreezefsm.features.photoReg.adapter.PhotoRegUserListner
 import com.oriplastbreezefsm.features.photoReg.api.GetUserListPhotoRegProvider
-import com.oriplastbreezefsm.features.photoReg.model.*
+import com.oriplastbreezefsm.features.photoReg.model.AadhaarSubmitData
+import com.oriplastbreezefsm.features.photoReg.model.DeleteUserPicResponse
+import com.oriplastbreezefsm.features.photoReg.model.GetAllAadhaarResponse
+import com.oriplastbreezefsm.features.photoReg.model.GetUserListResponse
+import com.oriplastbreezefsm.features.photoReg.model.UpdateUserNameModel
+import com.oriplastbreezefsm.features.photoReg.model.UpdateUserNameResponse
+import com.oriplastbreezefsm.features.photoReg.model.UserListResponseModel
 import com.oriplastbreezefsm.features.photoReg.present.UpdateDSTypeStatusDialog
 import com.oriplastbreezefsm.features.reimbursement.presentation.FullImageDialog
 import com.oriplastbreezefsm.widgets.AppCustomEditText
@@ -63,20 +83,30 @@ import com.oriplastbreezefsm.widgets.AppCustomTextView
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
-import com.squareup.picasso.*
+import com.google.gson.JsonParser
+import com.itextpdf.text.pdf.PdfName.XML
+import com.squareup.picasso.Cache
+import com.squareup.picasso.LruCache
+import com.squareup.picasso.MemoryPolicy
+import com.squareup.picasso.NetworkPolicy
+import com.squareup.picasso.Picasso
 import com.squareup.picasso.Picasso.RequestTransformer
 import com.themechangeapp.pickimage.PermissionHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import lecho.lib.hellocharts.model.PieChartData
-import lecho.lib.hellocharts.model.SliceValue
-import lecho.lib.hellocharts.view.PieChartView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import org.json.JSONArray
+import org.json.JSONObject
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
-import java.util.*
+import java.util.Locale
 
 
 class ProtoRegistrationFragment : BaseFragment(), View.OnClickListener {
@@ -188,6 +218,10 @@ class ProtoRegistrationFragment : BaseFragment(), View.OnClickListener {
 
     }
     // 1.0 MemberListFragment AppV 4.0.7 mantis 0025683 start
+
+
+
+
     private fun startVoiceInput() {
         val intent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         intent.putExtra(
@@ -213,8 +247,21 @@ class ProtoRegistrationFragment : BaseFragment(), View.OnClickListener {
 
     private var permissionUtils: PermissionUtils? = null
     private fun initPermissionCheck() {
+        //begin mantis id 26741 Storage permission updation Suman 22-08-2023
+        var permissionList = arrayOf<String>( Manifest.permission.CAMERA)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            permissionList += Manifest.permission.READ_MEDIA_IMAGES
+            permissionList += Manifest.permission.READ_MEDIA_AUDIO
+            permissionList += Manifest.permission.READ_MEDIA_VIDEO
+        }else{
+            permissionList += Manifest.permission.WRITE_EXTERNAL_STORAGE
+            permissionList += Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+        //end mantis id 26741 Storage permission updation Suman 22-08-2023
         permissionUtils = PermissionUtils(mContext as Activity, object : PermissionUtils.OnPermissionListener {
             override fun onPermissionGranted() {
+                var grant = true
                 /*if(SDK_INT >= 30){
                     if (!Environment.isExternalStorageManager()){
                         requestPermission()
@@ -231,8 +278,8 @@ class ProtoRegistrationFragment : BaseFragment(), View.OnClickListener {
             override fun onPermissionNotGranted() {
                 (mContext as DashboardActivity).showSnackMessage(getString(R.string.accept_permission))
             }
-
-        }, arrayOf<String>(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            // mantis id 26741 Storage permission updation Suman 22-08-2023
+        },permissionList)// arrayOf<String>(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))
     }
 
     fun onRequestPermission(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
