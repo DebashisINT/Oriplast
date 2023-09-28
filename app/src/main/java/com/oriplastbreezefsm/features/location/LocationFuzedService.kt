@@ -4105,6 +4105,11 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
             try {
                 var obj = AppDatabase.getDBInstance()!!.userLocationDataDao().getLastRecord()
                 finalDistance = obj.distance
+
+                //begin 26-09-2023 Suman mantis id 26857
+                finalDistance = "0.0"
+                //end 26-09-2023 Suman mantis id 26857
+
             } catch (ex: Exception) {
                 finalDistance = "0.0"
             }
