@@ -67,7 +67,7 @@ import com.oriplastbreezefsm.features.taskManagement.model.TaskManagmentEntity
         ShopDtlsTeamEntity::class, CollDtlsTeamEntity::class, BillDtlsTeamEntity::class, OrderDtlsTeamEntity::class,
         TeamAllShopDBModelEntity::class, DistWiseOrderTblEntity::class, NewGpsStatusEntity::class,ShopExtraContactEntity::class,ProductOnlineRateTempEntity::class, TaskManagmentEntity::class,
     VisitRevisitWhatsappStatus::class),
-        version = 3, exportSchema = false)
+        version = 4, exportSchema = false)
 @TypeConverters(DateConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun addShopEntryDao(): AddShopDao
@@ -219,7 +219,7 @@ abstract class AppDatabase : RoomDatabase() {
                         // allow queries on the main thread.
                         // Don't do this on a real app! See PersistenceBasicSample for an example.
                         .allowMainThreadQueries()
-                        .addMigrations(MIGRATION_1_2 , MIGRATION_2_3 )
+                        .addMigrations( MIGRATION_1_2 , MIGRATION_2_3,Migration_3_4 )
 //                        .fallbackToDestructiveMigration()
                         .build()
             }
@@ -258,9 +258,14 @@ abstract class AppDatabase : RoomDatabase() {
 
             }
         }
+        val Migration_3_4: Migration = object :Migration(3,4){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("alter table shop_detail ADD COLUMN FSSAILicNo TEXT")
+                database.execSQL("alter table shop_detail ADD COLUMN isUpdateAddressFromShopMaster INTEGER DEFAULT 0")
+            }
+        }
 
-
-   }
+    }
 
 
 //}

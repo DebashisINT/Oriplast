@@ -15,6 +15,7 @@ import android.util.Log
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.oriplastbreezefsm.CustomStatic
 import com.oriplastbreezefsm.R
 import com.oriplastbreezefsm.app.AppConstant

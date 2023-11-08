@@ -78,6 +78,7 @@ import com.google.android.gms.location.LocationRequest
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_add_shop.FSSAILic_EDT
 import net.alexandroid.gps.GpsStatusDetector
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -94,6 +95,7 @@ import kotlin.collections.ArrayList
 // 2.0 BaseActivity AppV 4.0.7  Saheli    16/02/2023 mantis autologout issue 25678
 // 3.0 BaseActivity AppV 4.0.7  Saheli    20/02/2023 mantis gps with list issue 0025685
 // 4.0 BaseActivity AppV 4.0.7 Saheli    02/03/2023 Timber Log Implementation
+// 5.0 BaseActivity AppV 4.2.2 tufan    20/09/2023 FSSAI Lic No Implementation 26813
 open class BaseActivity : AppCompatActivity(), GpsStatusDetector.GpsStatusDetectorCallBack {
 
     private val mRegistry = LifecycleRegistry(this)
@@ -2442,6 +2444,15 @@ val revisitStatusList : MutableList<ShopRevisitStatusRequestData> = ArrayList()
             addShopData.isShopDuplicate=mAddShopDBModelEntity.isShopDuplicate
 
             addShopData.purpose=mAddShopDBModelEntity.purpose
+
+//start AppV 4.2.2 tufan    20/09/2023 FSSAI Lic No Implementation 26813
+            try {
+                addShopData.FSSAILicNo = mAddShopDBModelEntity.FSSAILicNo
+            }catch (ex:Exception){
+                ex.printStackTrace()
+                addShopData.FSSAILicNo = ""
+            }
+//end AppV 4.2.2 tufan    20/09/2023 FSSAI Lic No Implementation 26813
 
             addShopData.GSTN_Number=mAddShopDBModelEntity.gstN_Number
             addShopData.ShopOwner_PAN=mAddShopDBModelEntity.shopOwner_PAN

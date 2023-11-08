@@ -368,6 +368,15 @@ class ChurnProbFrag : BaseFragment(), View.OnClickListener{
             var finalS :ArrayList<ChurnShopL> = ArrayList()
             for(i in 0..shopCusFinalL.size-1){
                 var obj = shopCusFinalL.get(i)
+
+                try{
+                    var typeN = AppDatabase.getDBInstance()!!.shopTypeDao().getShopTypeNameById(obj.shop_id)
+                    obj.shopType = typeN
+                }catch (ex:Exception){
+                    ex.printStackTrace()
+                    obj.shopType = "N/A"
+                }
+
                 if(!obj.tag1 && !obj.tag2 && !obj.tag3 && !obj.tag4 && !obj.tag5 && !obj.tag6){
                     finalS.add(obj)
                 }else if(obj.tag1 && !obj.tag2 && !obj.tag3 && !obj.tag4 && !obj.tag5 && !obj.tag6){

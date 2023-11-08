@@ -158,6 +158,13 @@ import java.nio.channels.FileChannel
 import java.util.*
 import java.util.concurrent.ExecutionException
 import kotlin.collections.ArrayList
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import org.json.JSONException
+import org.json.JSONObject
 
 
 /**Permission NameDISABLE KEYGUARD Status
@@ -267,6 +274,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
             initPermissionCheck()
         else
             getIMEI()
+
+        Pref.IsLoggedIn = false
 
         locationManager = getSystemService(Service.LOCATION_SERVICE) as LocationManager
         isGPS = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -764,6 +773,19 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                     Pref.Show_distributor_scheme_with_Product = configResponse.Show_distributor_scheme_with_Product!!
                                 //End 15.0 Pref v 4.1.6 Tufan 22/08/2023 mantis 26649 Show distributor scheme with Product
 
+                                //Begin 16.0 Pref v 4.1.6 Tufan 07/09/2023 mantis 26785 Multi visit Interval in Minutes Against the Same Shop
+                                if (configResponse.MultiVisitIntervalInMinutes != null)
+                                    Pref.MultiVisitIntervalInMinutes = configResponse.MultiVisitIntervalInMinutes!!
+                                //End 16.0 Pref v 4.1.6 Tufan 07/09/2023 mantis 26785 Multi visit Interval in Minutes Against the Same Shop
+
+                                //Begin v 4.1.6 Tufan 21/09/2023 mantis 26812 AND 26813  FSSAI Lic No and GSTINPANMandatoryforSHOPTYPE4 In add shop page edit
+                                if (configResponse.GSTINPANMandatoryforSHOPTYPE4 != null)
+                                    Pref.GSTINPANMandatoryforSHOPTYPE4 = configResponse.GSTINPANMandatoryforSHOPTYPE4!!
+                                if (configResponse.FSSAILicNoEnableInShop != null)
+                                    Pref.FSSAILicNoEnableInShop = configResponse.FSSAILicNoEnableInShop!!
+                                if (configResponse.FSSAILicNoMandatoryInShop4 != null)
+                                    Pref.FSSAILicNoMandatoryInShop4 = configResponse.FSSAILicNoMandatoryInShop4!!
+                                //Edit v 4.1.6 Tufan 21/09/2023 mantis 26812 AND 26813  FSSAI Lic No and GSTINPANMandatoryforSHOPTYPE4 In add shop page edit
 
                                 /*if (configResponse.willShowUpdateDayPlan != null)
                                     Pref.willShowUpdateDayPlan = configResponse.willShowUpdateDayPlan!!
@@ -3489,6 +3511,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
             permissionList += Manifest.permission.READ_MEDIA_IMAGES
             permissionList += Manifest.permission.READ_MEDIA_AUDIO
             permissionList += Manifest.permission.READ_MEDIA_VIDEO
+            permissionList += Manifest.permission.POST_NOTIFICATIONS
         }else{
             permissionList += Manifest.permission.WRITE_EXTERNAL_STORAGE
             permissionList += Manifest.permission.READ_EXTERNAL_STORAGE
@@ -3639,7 +3662,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                 getIMEI()
         }*/
         takeActionOnGeofence()
-        checkForFingerPrint()
+        //checkForFingerPrint()
     }
 
     private fun checkForFingerPrint() {
@@ -3653,14 +3676,17 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                 override fun isFingerPrintSupported(status: Boolean) {
                     if (status) {
                         Log.e("LoginActivity", "========Device support fingerprint===========")
+                        println("LoginActivity_finger"+ "========Device support fingerprint===========")
                     } else {
                         Log.e("LoginActivity", "==========Device does not support fingerprint===========")
+                        println("LoginActivity_finger"+ "========Device does not support fingerprint===========")
                         isFingerPrintSupported = false
                     }
                 }
 
                 override fun onSuccess(signal: CancellationSignal?) {
                     Log.e("LoginActivity", "============Fingerprint accepted=============")
+                    println("LoginActivity_finger"+ "========Fingerprint accepted===========")
 
                     if (fingerprintDialog != null && fingerprintDialog?.isVisible!!) {
                         fingerprintDialog?.dismiss()
@@ -3681,7 +3707,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
 
                 override fun onError(msg: String) {
                     Log.e("LoginActivity", "Fingerprint error=====> " + msg)
-
+                    println("LoginActivity_finger"+ "=error======")
                     when {
                         msg.equals("Fingerprint operation cancelled.", ignoreCase = true) -> {
                         }
@@ -3698,6 +3724,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
             })
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                println("LoginActivity_finger"+ " >M")
                 CheckFingerPrint().FingerprintHandler().doAuth()
             }
         } catch (e: Exception) {
@@ -4179,6 +4206,12 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
             println("xyz - initiateLogin end" + AppUtils.getCurrentDateTime());
             Handler(Looper.getMainLooper()).postDelayed({
                 callNewSettingsApi()
+                // code by puja on 11/6/2023
+                try {
+                    //callNewSettingsApiModified(username_EDT.text.toString().trim(), password_EDT.text.toString())
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                }
             }, 400)
         } else {
             //showSnackMessage(getString(R.string.no_internet))
@@ -4262,7 +4295,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                 } else
                                     prapareLogin(this@LoginActivity)
 
-                            } else {
+                            }
+                            else {
                                /* progress_wheel.stopSpinning()*/
                                 println("tag_edit else")
                                 loadNotProgress()// mantis 0025667
@@ -4314,6 +4348,147 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                             showSnackMessage(getString(R.string.something_went_wrong_new))
                         })
         )
+    }
+
+    private fun callNewSettingsApiModified(userName: String, password: String) {
+
+        val queue = Volley.newRequestQueue(this)
+
+        loadProgress()
+
+        val request: StringRequest =
+            object : StringRequest(Request.Method.POST, "http://3.7.30.86:8072/API/Configuration/LoginSettings", object : Response.Listener<String?> {
+                override fun onResponse(response: String?) {
+
+                    // Toast.makeText(this@LoginActivity, "Data Updated..", Toast.LENGTH_SHORT).show()
+                    try {
+
+                        println("xyz - callNewModifiedSettingsApi started" + response);
+                        val respObj = JSONObject(response)
+
+                        val newSettings = NewSettingsResponseModel()
+                        newSettings.status = respObj.getString("status")
+                        newSettings.message = respObj.getString("message")
+                        newSettings.isAddAttendence = respObj.getBoolean("isAddAttendence")
+                        newSettings.isFingerPrintMandatoryForAttendance = respObj.getBoolean("isFingerPrintMandatoryForAttendance")
+                        newSettings.isFingerPrintMandatoryForVisit = respObj.getBoolean("isFingerPrintMandatoryForVisit")
+                        newSettings.isSelfieMandatoryForAttendance = respObj.getBoolean("isSelfieMandatoryForAttendance")
+                        println("abc - callNewModifiedSettingsApi started-" + respObj);
+
+                        if (newSettings.status == NetworkConstant.SUCCESS) {
+                            // progress_wheel.stopSpinning()
+                            if (newSettings.isFingerPrintMandatoryForAttendance != null)
+                                Pref.isFingerPrintMandatoryForAttendance = newSettings.isFingerPrintMandatoryForAttendance!!
+
+                            if (newSettings.isFingerPrintMandatoryForVisit != null)
+                                Pref.isFingerPrintMandatoryForVisit = newSettings.isFingerPrintMandatoryForVisit!!
+
+                            if (newSettings.isSelfieMandatoryForAttendance != null)
+                                Pref.isSelfieMandatoryForAttendance = newSettings.isSelfieMandatoryForAttendance!!
+
+                            if (newSettings.isAddAttendence!!) {
+                                if (Pref.isFingerPrintMandatoryForAttendance) {
+                                    if (isFingerPrintSupported) {
+                                        checkForFingerPrint()
+
+                                        fingerprintDialog = FingerprintDialog()
+                                        fingerprintDialog?.show(supportFragmentManager, "")
+                                    } else {
+                                        if (Pref.isSelfieMandatoryForAttendance){
+                                            if(Pref.IsLoginSelfieRequired){
+                                                showSelfieDialog()
+                                            }else{
+                                                prapareLogin(this@LoginActivity)
+                                            }
+                                        }
+                                        else{
+                                            prapareLogin(this@LoginActivity)
+                                        }
+                                    }
+                                }
+                                else if (Pref.isSelfieMandatoryForAttendance){
+                                    if(Pref.IsLoginSelfieRequired){
+                                        showSelfieDialog()
+                                    }else{
+                                        prapareLogin(this@LoginActivity)
+                                    }
+                                }
+                                else {
+                                    prapareLogin(this@LoginActivity)
+                                }
+                            } else
+                                prapareLogin(this@LoginActivity)
+
+                        }
+                        else {
+                            // progress_wheel.stopSpinning()
+                            println("tag_edit else")
+                            loadNotProgress()// mantis 0025667
+                            login_TV.isEnabled = true
+
+                            //Begin 19.0  LoginActivity 0026332	mantis Suman v 4.1.6 21-06-2023
+                            username_EDT.isEnabled = true
+                            password_EDT.isEnabled = true
+
+                            username_EDT.isFocusable = true
+                            username_EDT.isCursorVisible = true
+
+                            password_EDT.isFocusable = true
+                            password_EDT.isCursorVisible = true
+                            //ENd of 19.0  LoginActivity 0026332	mantis Suman v 4.1.6 21-06-2023
+
+                            enableScreen()
+                            openDialogPopup(newSettings.message!!)
+                        }
+                        isApiInitiated = false
+
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
+                }
+            }, object : Response.ErrorListener {
+                override fun onErrorResponse(error: VolleyError?) {
+
+                    println("tag_edit err")
+                    Timber.d(" Login callNewSettingsApi : error : " +error!!.message.toString())
+                    isApiInitiated = false
+                    error!!.printStackTrace()
+                    loadNotProgress()// mantis 0025667
+                    //  progress_wheel.stopSpinning()
+                    login_TV.isEnabled = true
+                    username_EDT.isEnabled = true
+                    password_EDT.isEnabled = true
+
+                    //Begin 19.0  LoginActivity 0026332	mantis Suman v 4.1.6 21-06-2023
+                    username_EDT.isEnabled = true
+                    password_EDT.isEnabled = true
+
+                    username_EDT.isFocusable = true
+                    username_EDT.isCursorVisible = true
+
+                    password_EDT.isFocusable = true
+                    password_EDT.isCursorVisible = true
+                    //ENd of 19.0  LoginActivity 0026332	mantis Suman v 4.1.6 21-06-2023
+
+                    enableScreen()
+                    // 17.0  LoginActivity start 0026316	mantis saheli v 4.1.6 09-06-2023
+//                            AppUtils.deleteCache(mContext)
+                    // 17.0  LoginActivity end 0026316	mantis saheli v 4.1.6 09-06-2023
+                    showSnackMessage(getString(R.string.something_went_wrong_new))
+                }
+            }) {
+                override fun getParams(): MutableMap<String, String>? {
+
+                    val params: MutableMap<String, String> = HashMap()
+
+                    params["user_name"] = userName
+                    params["password"] = password
+
+                    return params
+                }
+            }
+
+        queue.add(request)
     }
 
     private fun showSelfieDialog() {
@@ -6660,11 +6835,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                                 if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
                                                     Pref.IsMenuShowAIMarketAssistant = response.getconfigure?.get(i)?.Value == "1"
                                                 }
-                                            }  else if (response.getconfigure?.get(i)?.Key.equals("IsUsbDebuggingRestricted", ignoreCase = true)) {
-                                                Pref.IsUsbDebuggingRestricted = response.getconfigure!![i].Value == "1"
-                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
-                                                    Pref.IsUsbDebuggingRestricted = response.getconfigure?.get(i)?.Value == "1"
-                                                }
                                             }
                                             //Begin 21.0 LoginActivity v 4.1.6 Suman 13/07/2023 mantis 26555 Usersettings
                                             else if (response.getconfigure?.get(i)?.Key.equals("IsUsbDebuggingRestricted", ignoreCase = true)) {
@@ -6674,6 +6844,13 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                                 }
                                             }
                                             //End 21.0 LoginActivity v 4.1.6 Suman 13/07/2023 mantis 26555 Usersettings
+
+                                            else if (response.getconfigure?.get(i)?.Key.equals("IsDisabledUpdateAddress", ignoreCase = true)) {
+                                                Pref.IsDisabledUpdateAddress = response.getconfigure!![i].Value == "1"
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsDisabledUpdateAddress = response.getconfigure?.get(i)?.Value == "1"
+                                                }
+                                            }
 
                                             /*else if (response.getconfigure?.get(i)?.Key.equals("isFingerPrintMandatoryForAttendance", ignoreCase = true)) {
                                                 if (!TextUtilsDash.isEmpty(response.getconfigure?.get(i)?.Value)) {
@@ -6980,10 +7157,26 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
             shopObj.isShopDuplicate=shop_list[i].isShopDuplicate
 
             shopObj.purpose=shop_list[i].purpose
+            //start AppV 4.2.2 tufan    20/09/2023 FSSAI Lic No Implementation 26813
+            try {
+                shopObj.FSSAILicNo = shop_list[i].FSSAILicNo
+            }catch (ex:Exception){
+                ex.printStackTrace()
+                shopObj.FSSAILicNo = ""
+            }
+//end AppV 4.2.2 tufan    20/09/2023 FSSAI Lic No Implementation 26813
+
+
 
             /*GSTIN & PAN NUMBER*/
             shopObj.gstN_Number=shop_list[i].GSTN_Number
             shopObj.shopOwner_PAN=shop_list[i].ShopOwner_PAN
+            try{
+                shopObj.isUpdateAddressFromShopMaster = shop_list[i].isUpdateAddressFromShopMaster
+            }catch (ex:Exception){
+                ex.printStackTrace()
+                shopObj.isUpdateAddressFromShopMaster = false
+            }
 
 
             list.add(shopObj)
@@ -7194,6 +7387,16 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                 shopObj.isShopDuplicate=shop_list[i].isShopDuplicate
 
                 shopObj.purpose=shop_list[i].purpose
+                //start AppV 4.2.2 tufan    20/09/2023 FSSAI Lic No Implementation 26813
+                try {
+                    shopObj.FSSAILicNo = shop_list[i].FSSAILicNo
+                }catch (ex:Exception){
+                    ex.printStackTrace()
+                    shopObj.FSSAILicNo = ""
+                }
+//end AppV 4.2.2 tufan    20/09/2023 FSSAI Lic No Implementation 26813
+
+
                 shopObj.isOwnshop = false
 
                 list.add(shopObj)

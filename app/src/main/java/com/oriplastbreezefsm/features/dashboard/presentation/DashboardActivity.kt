@@ -11,6 +11,7 @@ import android.app.PendingIntent
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.*
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -47,15 +48,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.*
 import com.android.volley.AuthFailureError
+import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.oriplastbreezefsm.*
 import com.oriplastbreezefsm.R
 import com.oriplastbreezefsm.app.*
 import com.oriplastbreezefsm.app.NewFileUtils.browseDocuments
+import com.oriplastbreezefsm.app.NewFileUtils.browsePDFDocuments
 import com.oriplastbreezefsm.app.NewFileUtils.getExtension
 import com.oriplastbreezefsm.app.domain.*
 import com.oriplastbreezefsm.app.types.DashboardType
@@ -165,6 +170,9 @@ import com.oriplastbreezefsm.features.login.model.alarmconfigmodel.AlarmConfigDa
 import com.oriplastbreezefsm.features.login.presentation.LoginActivity
 import com.oriplastbreezefsm.features.logout.presentation.api.LogoutRepositoryProvider
 import com.oriplastbreezefsm.features.logoutsync.presentation.LogoutSyncFragment
+import com.oriplastbreezefsm.features.marketAssist.MarketAssistTabFrag
+import com.oriplastbreezefsm.features.marketAssist.ShopDtlsMarketAssistFrag
+import com.oriplastbreezefsm.features.marketAssist.ShopListMarketAssistFrag
 import com.oriplastbreezefsm.features.marketing.presentation.MarketingPagerFragment
 import com.oriplastbreezefsm.features.meetinglist.prsentation.MeetingListFragment
 import com.oriplastbreezefsm.features.member.MapViewForTeamFrag
@@ -209,7 +217,9 @@ import com.oriplastbreezefsm.features.performance.GpsStatusFragment
 import com.oriplastbreezefsm.features.performance.PerformanceFragment
 import com.oriplastbreezefsm.features.performance.api.UpdateGpsStatusRepoProvider
 import com.oriplastbreezefsm.features.performance.model.UpdateGpsInputParamsModel
+import com.oriplastbreezefsm.features.performanceAPP.OwnPerformanceFragment
 import com.oriplastbreezefsm.features.performanceAPP.PerformanceAppFragment
+import com.oriplastbreezefsm.features.performanceAPP.allPerformanceFrag
 import com.oriplastbreezefsm.features.permissionList.ViewPermissionFragment
 import com.oriplastbreezefsm.features.photoReg.*
 import com.oriplastbreezefsm.features.privacypolicy.PrivacypolicyWebviewFrag
@@ -226,6 +236,7 @@ import com.oriplastbreezefsm.features.stock.StockListFragment
 import com.oriplastbreezefsm.features.stockAddCurrentStock.AddShopStockFragment
 import com.oriplastbreezefsm.features.stockAddCurrentStock.UpdateShopStockFragment
 import com.oriplastbreezefsm.features.stockAddCurrentStock.ViewStockDetailsFragment
+import com.oriplastbreezefsm.features.stockAddCurrentStock.model.MultipleImageFileUploadonStock
 import com.oriplastbreezefsm.features.stockCompetetorStock.AddCompetetorStockFragment
 import com.oriplastbreezefsm.features.stockCompetetorStock.CompetetorStockFragment
 import com.oriplastbreezefsm.features.stockCompetetorStock.ViewComStockProductDetails
@@ -267,6 +278,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.JsonParser
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
@@ -276,6 +288,7 @@ import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import com.themechangeapp.pickimage.PermissionHelper
 import com.themechangeapp.pickimage.PermissionHelper.Companion.REQUEST_CODE_DOCUMENT
+import com.themechangeapp.pickimage.PermissionHelper.Companion.REQUEST_CODE_DOCUMENT_PDF
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_dashboard_new.*
@@ -292,16 +305,13 @@ import java.io.*
 import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
+import retrofit2.http.GET
+
 import android.R.attr.name
-import android.content.pm.ApplicationInfo
-import com.oriplastbreezefsm.app.NewFileUtils.browsePDFDocuments
-import com.oriplastbreezefsm.features.marketAssist.MarketAssistTabFrag
-import com.oriplastbreezefsm.features.marketAssist.ShopDtlsMarketAssistFrag
-import com.oriplastbreezefsm.features.marketAssist.ShopListMarketAssistFrag
-import com.oriplastbreezefsm.features.performanceAPP.OwnPerformanceFragment
-import com.oriplastbreezefsm.features.performanceAPP.allPerformanceFrag
-import com.oriplastbreezefsm.features.stockAddCurrentStock.model.MultipleImageFileUploadonStock
-import com.themechangeapp.pickimage.PermissionHelper.Companion.REQUEST_CODE_DOCUMENT_PDF
+import android.media.MediaPlayer
+import android.media.RingtoneManager
+import com.squareup.okhttp.Call
+import retrofit2.http.Query
 
 
 /*
@@ -360,6 +370,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
     @SuppressLint("MissingPermission")
     override fun loadFragment(mFragType: FragType, addToStack: Boolean, initializeObject: Any) {
         AppUtils.contx = this
+        Pref.IsLoggedIn = true
 
         drawerLayout.closeDrawers()
 
@@ -382,19 +393,221 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
             //println("fcm_token " + token.toString());
             Timber.d("token : " + token.toString())
         })
-        println("load_frag " + mFragType.toString() + "     " + Pref.user_id.toString() + " "+Pref.profile_state );
 
-        //val distance = LocationWizard.getDistance(22.4339117,	87.3366233, 22.52156	,87.3279733)
-        //Pref.isExpenseFeatureAvailable = false
-        Timber.d("dash_frag ${AppUtils.getCurrentDateTime()} ${Pref.user_name} ${Pref.profile_state}")
-        if (addToStack) {
+        //begin Suman 21-09-2023 mantis id 0026837
+        try{
+            val packageName = "com.google.android.apps.maps"
+            val appInfo: ApplicationInfo = this.getPackageManager().getApplicationInfo(packageName, 0)
+            var appstatus = appInfo.enabled
+
+            if(!appstatus && !mFragType.equals(FragType.DashboardFragment)){
+                val simpleDialog = Dialog(mContext)
+                simpleDialog.setCancelable(false)
+                simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                simpleDialog.setContentView(R.layout.dialog_ok)
+                val dialogHeader = simpleDialog.findViewById(R.id.dialog_yes_header_TV) as AppCustomTextView
+                dialogHeader.text = "Location will be inappropriate as Google map is disabled. Please go to settings of your phone and Enable Google Map. Thank you."
+                val dialogYes = simpleDialog.findViewById(R.id.tv_dialog_yes) as AppCustomTextView
+                dialogYes.setOnClickListener({ view ->
+                    simpleDialog.cancel()
+                })
+                simpleDialog.show()
+                return
+            }else{
+                println("load_frag " +" gmap app enable")
+            }
+
+            //val pInfo = this.packageManager.getPackageInfo("com.google.android.apps.maps", PackageManager.GET_PERMISSIONS)
+            //val version = pInfo.versionName
+        }catch (ex:Exception){
+            ex.printStackTrace()
+        }
+        //end Suman 21-09-2023 mantis id 0026837
+
+        println("load_frag " + mFragType.toString() + "     " + Pref.user_id.toString()+" "+Pref.IsDisabledUpdateAddress )
+
+        if(mFragType.equals(FragType.DashboardFragment) && !mFragType.equals(FragType.LogoutSyncFragment)){
+            Pref.IsAnyPageVisitFromDshboard = false
+            println("dasg_tag if")
+        }else{
+            Pref.IsAnyPageVisitFromDshboard = true
+            println("dasg_tag else")
+        }
+
+        batteryCheck(mFragType,addToStack,initializeObject)
+
+        /*if (addToStack) {
             mTransaction.add(R.id.frame_layout_container, getFragInstance(mFragType, initializeObject, true)!!, mFragType.toString())
             mTransaction.addToBackStack(mFragType.toString()).commitAllowingStateLoss()
         } else {
             mTransaction.replace(R.id.frame_layout_container, getFragInstance(mFragType, initializeObject, true)!!, mFragType.toString())
             mTransaction.commitAllowingStateLoss()
+        }*/
+
+    }
+
+
+
+    fun batteryCheck(mFragType: FragType, addToStack: Boolean, initializeObject: Any){
+        val mTransaction = supportFragmentManager.beginTransaction()
+        mTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+        try{
+            val pm = mContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+            var sett = pm.isIgnoringBatteryOptimizations(packageName)
+            if(!mFragType.equals(FragType.DashboardFragment) && sett==false && !mFragType.equals(FragType.LogoutSyncFragment)){
+                val simpleDialog = Dialog(mContext)
+                simpleDialog.setCancelable(false)
+                simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                simpleDialog.setContentView(R.layout.dialog_ok_logout)
+                val dialogHeader = simpleDialog.findViewById(R.id.dialog_yes_header_TV) as AppCustomTextView
+                var msgHead = "App battery Saver is turned on. Please follow the below settings."
+                if(AppUtils.getDeviceName().contains("MI",ignoreCase = true) || AppUtils.getDeviceName().contains("Redmi",ignoreCase = true) ||
+                    AppUtils.getDeviceName().contains("Poco",ignoreCase = true)){
+                    dialogHeader.text = msgHead+" "+"Go to Settings -> Apps -> Manage Apps -> FSM App -> Battery Saver -> No restrictions."
+                }else if(AppUtils.getDeviceName().contains("Vivo",ignoreCase = true)){
+                    dialogHeader.text = msgHead+" "+"Go to Settings -> Battery -> Background Battery Power Consumption Ranking / High Background Power Consumption -> FSM App -> Don't Restrict."
+                }else{
+                    dialogHeader.text = msgHead+" "+"Go to Settings -> Apps -> FSM App -> Battery -> Unrestricted."
+                }
+                val dialogYes = simpleDialog.findViewById(R.id.tv_dialog_yes) as AppCustomTextView
+                dialogYes.setOnClickListener({ view ->
+                    //simpleDialog.cancel()
+                    //callLogout()
+
+                    /*val intent = Intent()
+                    val packageName = packageName
+                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    mContext.startActivity(intent)*/
+                })
+                simpleDialog.show()
+                Handler().postDelayed(Runnable {
+                    val timer = object : CountDownTimer(6 * 1000, 1000) {
+                        override fun onTick(millisUntilFinished: Long) {
+                            dialogYes.text = "Logout in "+(millisUntilFinished / 1000).toString()+" seconds..."
+                        }
+                        override fun onFinish() {
+                            simpleDialog.cancel()
+                            callLogout()
+                            //Toaster.msgShort(this@DashboardActivity,"Logout call")
+                        }
+                    }.start()
+                }, 1000)
+            }
+            else{
+                if (addToStack) {
+                    mTransaction.add(R.id.frame_layout_container, getFragInstance(mFragType, initializeObject, true)!!, mFragType.toString())
+                    mTransaction.addToBackStack(mFragType.toString()).commitAllowingStateLoss()
+                } else {
+                    mTransaction.replace(R.id.frame_layout_container, getFragInstance(mFragType, initializeObject, true)!!, mFragType.toString())
+                    mTransaction.commitAllowingStateLoss()
+                }
+            }
+        }catch (ex:Exception){
+            ex.printStackTrace()
+            if (addToStack) {
+                mTransaction.add(R.id.frame_layout_container, getFragInstance(mFragType, initializeObject, true)!!, mFragType.toString())
+                mTransaction.addToBackStack(mFragType.toString()).commitAllowingStateLoss()
+            } else {
+                mTransaction.replace(R.id.frame_layout_container, getFragInstance(mFragType, initializeObject, true)!!, mFragType.toString())
+                mTransaction.commitAllowingStateLoss()
+            }
+        }
+    }
+
+    fun callLogout(){
+        Pref.IsAutoLogoutFromBatteryCheck = true
+        if(AppUtils.isOnline(this)){
+            Timber.d("Battery optimization in online mode.")
+            (mContext as DashboardActivity).loadFragment(FragType.LogoutSyncFragment, true, "")
+        }else{
+            Timber.d("Battery optimization in offline mode.")
+            try{
+                var  soundUriAlarm = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.getPackageName() + "/" + R.raw.beethoven)
+                if (soundUriAlarm == null){
+                    soundUriAlarm = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                }
+                var player: MediaPlayer = MediaPlayer.create(this, soundUriAlarm)
+                player.isLooping = true
+                player.start()
+                var vibrator : Vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                val pattern = longArrayOf(0, 5, 10, 20, 40, 80, 120, 100, 600, 700, 500, 500, 500)
+                vibrator.vibrate(pattern, 1)
+
+
+            val simpleDialog = Dialog(mContext)
+            simpleDialog.setCancelable(false)
+            simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            simpleDialog.setContentView(R.layout.dialog_ok)
+            val dialogHeader = simpleDialog.findViewById(R.id.dialog_yes_header_TV) as AppCustomTextView
+            dialogHeader.text = "Device is in offline mode. Internet connection is required for auto logout."
+            val dialogYes = simpleDialog.findViewById(R.id.tv_dialog_yes) as AppCustomTextView
+            dialogYes.setOnClickListener({ view ->
+                simpleDialog.cancel()
+                player.stop()
+                vibrator.cancel()
+            })
+            simpleDialog.show()
+            }catch (ex:Exception){
+                ex.printStackTrace()
+            }
         }
 
+
+        /*val unSyncedList = AppDatabase.getDBInstance()!!.userLocationDataDao().getLocationUpdateForADayNotSyn(AppUtils.convertFromRightToReverseFormat(Pref.login_date!!), false)
+        var distance = 0.0
+        if (unSyncedList != null && unSyncedList.isNotEmpty()) {
+            var totalDistance = 0.0
+            for (i in unSyncedList.indices) {
+                totalDistance += unSyncedList[i].distance.toDouble()
+            }
+            distance = Pref.tempDistance.toDouble() + totalDistance
+        }
+        else{
+            distance = Pref.tempDistance.toDouble()
+        }
+        var location = ""
+        if (Pref.logout_latitude != "0.0" && Pref.logout_longitude != "0.0") {
+            location = LocationWizard.getAdressFromLatlng(this, Pref.logout_latitude.toDouble(), Pref.logout_longitude.toDouble())
+            if (location.contains("http"))
+                location = "Unknown"
+        }
+
+        val repository = LogoutRepositoryProvider.provideLogoutRepository()
+        BaseActivity.compositeDisposable.add(
+            repository.logout(Pref.user_id!!, Pref.session_token!!, Pref.logout_latitude, Pref.logout_longitude,AppUtils.getCurrentDateTime(),
+                distance.toString(), "1", location)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({ result ->
+                    val logoutResponse = result as BaseResponse
+                    Timber.d("AUTO_LOGOUT : " + "RESPONSE : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + logoutResponse.message)
+                    if (logoutResponse.status == NetworkConstant.SUCCESS) {
+                        Pref.tempDistance = "0.0"
+                        if (unSyncedList != null && unSyncedList.isNotEmpty()) {
+                            for (i in unSyncedList.indices) {
+                                AppDatabase.getDBInstance()!!.userLocationDataDao().updateIsUploaded(true, unSyncedList[i].locationId)
+                            }
+                        }
+                        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                        notificationManager.cancelAll()
+                        Pref.logout_latitude = "0.0"
+                        Pref.logout_longitude = "0.0"
+                        clearData()
+                        Pref.isAutoLogout = false
+                        Pref.isAddAttendence = false
+                    } else
+                        performLogout()
+                        BaseActivity.isApiInitiated = false
+                        takeActionOnGeofence()
+                }, { error ->
+                        Toaster.msgShort(this, getString(R.string.something_went_wrong))
+                        Timber.d("AUTO_LOGOUT : " + "RESPONSE ERROR: " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
+                        error.printStackTrace()
+                        performLogout()
+                    })
+        )*/
     }
 
 
@@ -1436,6 +1649,36 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
     override fun onResume() {
         super.onResume()
 
+        //begin Suman 21-09-2023 mantis id 0026837
+        try{
+            val packageName = "com.google.android.apps.maps"
+            val appInfo: ApplicationInfo = this.getPackageManager().getApplicationInfo(packageName, 0)
+            var appstatus = appInfo.enabled
+
+            if(!appstatus){
+                val simpleDialog = Dialog(mContext)
+                simpleDialog.setCancelable(false)
+                simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                simpleDialog.setContentView(R.layout.dialog_ok)
+                val dialogHeader = simpleDialog.findViewById(R.id.dialog_yes_header_TV) as AppCustomTextView
+                dialogHeader.text = "Location will be inappropriate as Google map is disabled. Please go to settings of your phone and Enable Google Map. Thank you."
+                val dialogYes = simpleDialog.findViewById(R.id.tv_dialog_yes) as AppCustomTextView
+                dialogYes.setOnClickListener({ view ->
+                    simpleDialog.cancel()
+                })
+                simpleDialog.show()
+                return
+            }else{
+                println("load_frag " +" gmap app enable")
+            }
+
+            //val pInfo = this.packageManager.getPackageInfo("com.google.android.apps.maps", PackageManager.GET_PERMISSIONS)
+            //val version = pInfo.versionName
+        }catch (ex:Exception){
+            ex.printStackTrace()
+        }
+        //end Suman 21-09-2023 mantis id 0026837
+
         println("tag_lifecycle onresume")
         //if(Settings.Secure.getInt(this.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) == 1 && Pref.IsUsbDebuggingRestricted) {
         if(Settings.Secure.getInt(this.getContentResolver(), Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED , 0) == 1 && Pref.IsUsbDebuggingRestricted) {
@@ -1497,6 +1740,47 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         callUnreadNotificationApi()
 
             checkForFingerPrint()
+
+
+
+        //battery check onresume
+        if(Pref.IsAnyPageVisitFromDshboard){
+            val pm = mContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+            var sett = pm.isIgnoringBatteryOptimizations(packageName)
+            if(sett==false){
+                val simpleDialog = Dialog(mContext)
+                simpleDialog.setCancelable(false)
+                simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                simpleDialog.setContentView(R.layout.dialog_ok_logout)
+                val dialogHeader = simpleDialog.findViewById(R.id.dialog_yes_header_TV) as AppCustomTextView
+                if(AppUtils.getDeviceName().contains("MI",ignoreCase = true) || AppUtils.getDeviceName().contains("Redmi",ignoreCase = true) ||
+                    AppUtils.getDeviceName().contains("Poco",ignoreCase = true)){
+                    dialogHeader.text = "Go to Settings -> Apps -> Manage Apps -> FSM App -> Battery Saver -> No restrictions."
+                }else if(AppUtils.getDeviceName().contains("Vivo",ignoreCase = true)){
+                    dialogHeader.text = "Go to Settings -> Battery -> Background Battery Power Consumption Ranking / High Background Power Consumption -> FSM App -> Don't Restrict."
+                }else{
+                    dialogHeader.text = "Go to Settings -> Apps -> FSM App -> Battery -> Unrestricted."
+                }
+                val dialogYes = simpleDialog.findViewById(R.id.tv_dialog_yes) as AppCustomTextView
+                dialogYes.setOnClickListener({ view ->
+                    simpleDialog.cancel()
+                    callLogout()
+                })
+                simpleDialog.show()
+                Handler().postDelayed(Runnable {
+                    val timer = object : CountDownTimer(6 * 1000, 1000) {
+                        override fun onTick(millisUntilFinished: Long) {
+                            dialogYes.text = "Logout in "+(millisUntilFinished / 1000).toString()+" seconds..."
+                        }
+                        override fun onFinish() {
+                            simpleDialog.cancel()
+                            callLogout()
+                        }
+                    }.start()
+                }, 1000)
+            }
+        }
+
 
     }
 
@@ -3121,6 +3405,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
             }
             R.id.logout_TV -> {
                 //performLogout()
+                Pref.IsAutoLogoutFromBatteryCheck = false
                 if (Pref.DayEndMarked == false && Pref.IsShowDayEnd == true && Pref.DayStartMarked) {
                     showSnackMessage("Please mark Day End before logout. Thanks.")
                 } else {
@@ -4919,6 +5204,9 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                     } else
                         setTopBarVisibility(TopBarConfig.GPS)
                 }
+                if(Pref.IsAutoLogoutFromBatteryCheck){
+                    setTopBarVisibility(TopBarConfig.NONE)
+                }
             }
             FragType.ReimbursementFragment -> {
                 if (enableFragGeneration) {
@@ -6007,6 +6295,25 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
     private fun setTopBarVisibility(mTopBarConfig: TopBarConfig) {
         tv_noti_count.visibility = View.GONE
         when (mTopBarConfig) {
+            TopBarConfig.NONE ->{
+                iv_home_icon.visibility = View.GONE
+                iv_search_icon.visibility = View.GONE
+                iv_sync_icon.visibility = View.GONE
+                rl_cart.visibility = View.GONE
+                iv_filter_icon.visibility = View.GONE
+                rl_confirm_btn.visibility = View.GONE
+                iv_list_party.visibility = View.GONE
+                logo.visibility = View.GONE
+                iv_map.visibility = View.GONE
+                iv_settings.visibility = View.GONE
+                ic_calendar.visibility = View.GONE
+                ic_chat_bot.visibility = View.GONE
+                iv_cancel_chat.visibility = View.GONE
+                iv_people.visibility = View.GONE
+                iv_scan.visibility = View.GONE
+                iv_view_text.visibility = View.GONE
+                fl_net_status.visibility = View.GONE
+            }
             TopBarConfig.HOME -> {
                 iv_home_icon.visibility = View.VISIBLE
                 iv_search_icon.visibility = View.GONE
@@ -7813,10 +8120,16 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
             }
 
         } else if (getFragment() != null && getFragment() is LogoutSyncFragment) {
-            if (!isForceLogout) {
-                super.onBackPressed()
-                if (getFragment() != null && getFragment() is ChatBotFragment)
-                    (getFragment() as ChatBotFragment).update()
+            if(!Pref.IsAutoLogoutFromBatteryCheck){
+                try{
+                    if (!isForceLogout) {
+                        super.onBackPressed()
+                        if (getFragment() != null && getFragment() is ChatBotFragment)
+                            (getFragment() as ChatBotFragment).update()
+                    }
+                }catch (ex:Exception){
+                    ex.printStackTrace()
+                }
             }
         } else if (getFragment() != null && getFragment() is AddPJPLocationFragment) {
 

@@ -66,7 +66,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-
+import java.time.Duration
 
 /**
  * Created by Pratishruti on 08-11-2017.
@@ -1850,6 +1850,16 @@ class AppUtils {
             return df.format(Date()).toString()
         }
 
+        fun geTimeDuration( startTime: String , endTime: String ): String { // "2023-09-07T15:29:24" "2023-09-07T15:20:24"
+            val timestamp1 = LocalDateTime.parse(startTime)
+            val timestamp2 = LocalDateTime.parse(endTime)
+
+            val duration = Duration.between(timestamp1, timestamp2).abs()
+            val minutes = duration.toMinutes().toString()
+            return  minutes
+
+        }
+
         fun getCurrentDateForShopActi(): String {
             val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
             return df.format(Date()).toString()
@@ -3116,6 +3126,18 @@ class AppUtils {
             calendar.add(Calendar.DAY_OF_YEAR, -daysAgo)
 
             return calendar.time
+        }
+
+        fun getDiffDateTime(startTime:String,endTime:String):Int{
+            var date1 :Date = SimpleDateFormat("yy-mm-dd hh:mm:ss").parse(startTime)
+            var date2 :Date = SimpleDateFormat("yy-mm-dd hh:mm:ss").parse(endTime)
+            val diff: Long = date2.getTime() - date1.getTime()
+            val seconds = diff / 1000
+            val minutes = seconds / 60
+            val hours = minutes / 60
+            val days = hours / 24
+
+            return minutes.toInt()
         }
 
     }

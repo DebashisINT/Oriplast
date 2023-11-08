@@ -169,4 +169,11 @@ class ConfigFetchResponseModel : BaseResponse() {
 
     var Show_distributor_scheme_with_Product:Boolean?=null
 
+    var MultiVisitIntervalInMinutes:String? = ""
+
+    var GSTINPANMandatoryforSHOPTYPE4:Boolean?=null
+    var FSSAILicNoEnableInShop:Boolean?=null
+    var FSSAILicNoMandatoryInShop4:Boolean?=null
+
+
 }
