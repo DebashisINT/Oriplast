@@ -34,6 +34,11 @@ import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.oriplastbreezefsm.BuildConfig
 import com.oriplastbreezefsm.CustomStatic
@@ -70,6 +75,11 @@ import com.oriplastbreezefsm.features.billing.api.billinglistapi.BillingListRepo
 import com.oriplastbreezefsm.features.billing.model.BillingListResponseModel
 import com.oriplastbreezefsm.features.commondialog.presentation.CommonDialog
 import com.oriplastbreezefsm.features.commondialog.presentation.CommonDialogClickListener
+import com.oriplastbreezefsm.features.contacts.ContactMasterRes
+import com.oriplastbreezefsm.features.contacts.SourceMasterRes
+import com.oriplastbreezefsm.features.contacts.StageMasterRes
+import com.oriplastbreezefsm.features.contacts.StatusMasterRes
+import com.oriplastbreezefsm.features.contacts.TypeMasterRes
 import com.oriplastbreezefsm.features.dashboard.presentation.DashboardActivity
 import com.oriplastbreezefsm.features.dashboard.presentation.api.dayStartEnd.DayStartEndRepoProvider
 import com.oriplastbreezefsm.features.dashboard.presentation.api.gteroutelistapi.GetRouteListRepoProvider
@@ -152,19 +162,16 @@ import kotlinx.android.synthetic.main.frag_lead.progress_wheel
 import net.alexandroid.gps.GpsStatusDetector
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import org.json.JSONException
+import org.json.JSONObject
 import timber.log.Timber
 import java.io.*
 import java.nio.channels.FileChannel
 import java.util.*
 import java.util.concurrent.ExecutionException
 import kotlin.collections.ArrayList
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.VolleyError
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import org.json.JSONException
-import org.json.JSONObject
+
+
 
 
 /**Permission NameDISABLE KEYGUARD Status
@@ -268,7 +275,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
         setContentView(R.layout.activity_login_new)
         mContext = this@LoginActivity
         println("xyz - login oncreate started" + AppUtils.getCurrentDateTime());
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             initPermissionCheck()
@@ -795,6 +801,36 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
 
                                 if (!TextUtils.isEmpty(configResponse.dailyPlanListHeaderText))
                                     Pref.dailyPlanListHeaderText = configResponse.dailyPlanListHeaderText!!*/
+
+                                //Begin Puja 16.11.23 mantis-0026997 //
+
+                                if (configResponse.isLeadContactNumber != null)
+                                    Pref.isLeadContactNumber = configResponse.isLeadContactNumber!!
+
+                                if (configResponse.isModelEnable != null)
+                                    Pref.isModelEnable = configResponse.isModelEnable!!
+
+                                if (configResponse.isPrimaryApplicationEnable != null)
+                                    Pref.isPrimaryApplicationEnable = configResponse.isPrimaryApplicationEnable!!
+
+                                if (configResponse.isSecondaryApplicationEnable != null)
+                                    Pref.isSecondaryApplicationEnable = configResponse.isSecondaryApplicationEnable!!
+
+                                if (configResponse.isBookingAmount != null)
+                                    Pref.isBookingAmount = configResponse.isBookingAmount!!
+
+                                if (configResponse.isLeadTypeEnable != null)
+                                    Pref.isLeadTypeEnable = configResponse.isLeadTypeEnable!!
+
+                                if (configResponse.isStageEnable != null)
+                                    Pref.isStageEnable = configResponse.isStageEnable!!
+
+                                if (configResponse.isFunnelStageEnable != null)
+                                    Pref.isFunnelStageEnable = configResponse.isFunnelStageEnable!!
+
+
+                                //End Puja 16.11.23 mantis-0026997 //
+
                             }
                             isApiInitiated = false
                             /*API_Optimization 02-03-2022*/
@@ -808,6 +844,21 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                 Pref.isShowBeatGroup = false
                                 Pref.IsShowBeatInMenu = false
                             }
+
+                            //Begin Puja 16.11.23 mantics-0026997 //
+
+                            if(Pref.isCustomerFeatureEnable==false){
+                                Pref.isLeadContactNumber = false
+                                Pref.isModelEnable = false
+                                Pref.isPrimaryApplicationEnable = false
+                                Pref.isSecondaryApplicationEnable = false
+                                Pref.isBookingAmount = false
+                                Pref.isLeadTypeEnable = false
+                                Pref.isStageEnable = false
+                                Pref.isFunnelStageEnable = false
+                            }
+
+                            //End Puja 16.11.23 mantics-0026997 //
 
                             isStartOrEndDay()
 
@@ -1140,6 +1191,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
 
 
                                         AppDatabase.getDBInstance()?.productRateDao()?.insertAll(productRateList)
+
+
 
 
                                         /*  productRateList.forEach {
@@ -3506,6 +3559,9 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
     private fun initPermissionCheck() {
         //begin mantis id 26741 Storage permission updation Suman 22-08-2023
         var permissionList = arrayOf<String>( Manifest.permission.READ_PHONE_STATE, Manifest.permission.RECORD_AUDIO,)
+        permissionList+=Manifest.permission.READ_CALL_LOG
+        permissionList+=Manifest.permission.READ_CONTACTS
+        permissionList+=Manifest.permission.WRITE_CALL_LOG
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
             permissionList += Manifest.permission.READ_MEDIA_IMAGES
@@ -3832,82 +3888,134 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
         when (p0!!.id) {
             R.id.login_TV -> {
 
-                if(Settings.Secure.getInt(this.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) == 1 && false) {
-                    val simpleDialog = Dialog(mContext)
-                    simpleDialog.setCancelable(false)
-                    simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                    simpleDialog.setContentView(R.layout.dialog_debugger)
-                    val okBtn = simpleDialog.findViewById(R.id.tv_dialog_ok) as AppCustomTextView
-                    val tvHeader = simpleDialog.findViewById(R.id.dialog_yes_no_headerTV) as AppCustomTextView
-                    tvHeader.text = getString(R.string.app_name)
-                    okBtn.setOnClickListener({ view ->
-                        simpleDialog.cancel()
-                    })
-                    simpleDialog.show()
-                }
-                else {
-                    println("login_time_analysis ${AppUtils.getCurrentDateTime()}")
-                    //file del
-                    /*  doAsync {
-                          try{
-                              if(Pref.user_id==null){
-                                  val fileUrl = Uri.parse(File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), BuildConfig.APPLICATION_ID+"/Log/Fsmlog.html").path)
-                                  val file = File(fileUrl.path)
-                                  FileLoggingTree.fileDelete(file)
-                              }
-                          }catch (ex:Exception){
-                              ex.printStackTrace()
-                          }
-                          uiThread {
-                              Timber.plant(Timber.DebugTree())
-                              Timber.plant(FileLoggingTree())
-                          }
-                      }*/
-                    //Begin 18.0  LoginActivity 0026388	mantis Suman v 4.1.6 20-06-2023
-                    fetchCUrrentLoc()
-                    //End of 18.0  LoginActivity 0026388	mantis Suman v 4.1.6 20-06-2023
-
-                    Handler().postDelayed(Runnable {
-                        loadNotProgress()
-                        AppUtils.hideSoftKeyboard(this@LoginActivity)
-                        rl_main_new.requestFocus()
-
-                        Pref.selectedVisitStationID=""
-                        Pref.selectedVisitStationName=""
-
-                        Timber.d("Login btn clicked ${AppUtils.getCurrentDateTime()}")
-                        val stat = StatFs(Environment.getExternalStorageDirectory().path)
-                        val bytesAvailable: Long
-                        bytesAvailable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                            stat.blockSizeLong * stat.availableBlocksLong
-                        } else {
-                            stat.blockSize.toLong() * stat.availableBlocks.toLong()
-                        }
-                        val megAvailable = bytesAvailable / (1024 * 1024)
-                        println("storage " + megAvailable.toString());
-//                XLog.d("phone storage : FREE SPACE AVAILABLE : " + megAvailable.toString() + " Time :" + AppUtils.getCurrentDateTime())
-                        Timber.d("phone storage : FREE SPACE AVAILABLE : " + megAvailable.toString() + " Time :" + AppUtils.getCurrentDateTime())
-
-                        if (megAvailable < 5000 && false) {
-                            val simpleDialog = Dialog(this@LoginActivity)
-                            simpleDialog.setCancelable(false)
-                            simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                            simpleDialog.setContentView(R.layout.dialog_message)
-                            val dialogHeader = simpleDialog.findViewById(R.id.dialog_message_header_TV) as AppCustomTextView
-                            val dialog_yes_no_headerTV = simpleDialog.findViewById(R.id.dialog_message_headerTV) as AppCustomTextView
-                            if (Pref.user_name != null) {
-                                dialog_yes_no_headerTV.text = "Hi " + Pref.user_name!! + "!"
-                            } else {
-                                dialog_yes_no_headerTV.text = "Hi User" + "!"
+                val packageName = packageName
+                val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+                if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                    CommonDialog.getInstance(getString(R.string.app_name), "You must select the option 'Allow' to use this app. " ,
+                        "Cancel", "Ok", false, object : CommonDialogClickListener {
+                            override fun onLeftClick() {
+                                finish()
                             }
-                            //dialogHeader.text = "You have only "+megAvailable.toString()+ " MB available to store data. It is not sufficient\n" +
-                            //"to proceed. Please clear memory and Retry Login again. Thanks."
+                            override fun onRightClick(editableData: String) {
+                                val intent = Intent()
+                                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                                intent.data = Uri.parse("package:$packageName")
+                                startActivityForResult(intent, 998)
+                            }
+                        }).show(supportFragmentManager, "")
+                } else{
+                    if(Settings.Secure.getInt(this.getContentResolver(), Settings.Secure.ADB_ENABLED, 0) == 1 && false) {
+                        val simpleDialog = Dialog(mContext)
+                        simpleDialog.setCancelable(false)
+                        simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                        simpleDialog.setContentView(R.layout.dialog_debugger)
+                        val okBtn = simpleDialog.findViewById(R.id.tv_dialog_ok) as AppCustomTextView
+                        val tvHeader = simpleDialog.findViewById(R.id.dialog_yes_no_headerTV) as AppCustomTextView
+                        tvHeader.text = getString(R.string.app_name)
+                        okBtn.setOnClickListener({ view ->
+                            simpleDialog.cancel()
+                        })
+                        simpleDialog.show()
+                    }
+                    else {
+                        println("login_time_analysis ${AppUtils.getCurrentDateTime()}")
+                        //file del
+                        /*  doAsync {
+                              try{
+                                  if(Pref.user_id==null){
+                                      val fileUrl = Uri.parse(File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), BuildConfig.APPLICATION_ID+"/Log/Fsmlog.html").path)
+                                      val file = File(fileUrl.path)
+                                      FileLoggingTree.fileDelete(file)
+                                  }
+                              }catch (ex:Exception){
+                                  ex.printStackTrace()
+                              }
+                              uiThread {
+                                  Timber.plant(Timber.DebugTree())
+                                  Timber.plant(FileLoggingTree())
+                              }
+                          }*/
+                        //Begin 18.0  LoginActivity 0026388	mantis Suman v 4.1.6 20-06-2023
+                        fetchCUrrentLoc()
+                        //End of 18.0  LoginActivity 0026388	mantis Suman v 4.1.6 20-06-2023
 
-                            dialogHeader.text = "Please note that memory available is less than 5 GB. App may not function properly. Please make available memory greater than 5 GB."
+                        Handler().postDelayed(Runnable {
+                            loadNotProgress()
+                            AppUtils.hideSoftKeyboard(this@LoginActivity)
+                            rl_main_new.requestFocus()
 
-                            val dialogYes = simpleDialog.findViewById(R.id.tv_message_ok) as AppCustomTextView
-                            dialogYes.setOnClickListener({ view ->
-                                simpleDialog.cancel()
+                            Pref.selectedVisitStationID=""
+                            Pref.selectedVisitStationName=""
+
+                            Timber.d("Login btn clicked ${AppUtils.getCurrentDateTime()}")
+                            val stat = StatFs(Environment.getExternalStorageDirectory().path)
+                            val bytesAvailable: Long
+                            bytesAvailable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                                stat.blockSizeLong * stat.availableBlocksLong
+                            } else {
+                                stat.blockSize.toLong() * stat.availableBlocks.toLong()
+                            }
+                            val megAvailable = bytesAvailable / (1024 * 1024)
+                            println("storage " + megAvailable.toString());
+//                XLog.d("phone storage : FREE SPACE AVAILABLE : " + megAvailable.toString() + " Time :" + AppUtils.getCurrentDateTime())
+                            Timber.d("phone storage : FREE SPACE AVAILABLE : " + megAvailable.toString() + " Time :" + AppUtils.getCurrentDateTime())
+
+                            if (megAvailable < 5000 && false) {
+                                val simpleDialog = Dialog(this@LoginActivity)
+                                simpleDialog.setCancelable(false)
+                                simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                                simpleDialog.setContentView(R.layout.dialog_message)
+                                val dialogHeader = simpleDialog.findViewById(R.id.dialog_message_header_TV) as AppCustomTextView
+                                val dialog_yes_no_headerTV = simpleDialog.findViewById(R.id.dialog_message_headerTV) as AppCustomTextView
+                                if (Pref.user_name != null) {
+                                    dialog_yes_no_headerTV.text = "Hi " + Pref.user_name!! + "!"
+                                } else {
+                                    dialog_yes_no_headerTV.text = "Hi User" + "!"
+                                }
+                                //dialogHeader.text = "You have only "+megAvailable.toString()+ " MB available to store data. It is not sufficient\n" +
+                                //"to proceed. Please clear memory and Retry Login again. Thanks."
+
+                                dialogHeader.text = "Please note that memory available is less than 5 GB. App may not function properly. Please make available memory greater than 5 GB."
+
+                                val dialogYes = simpleDialog.findViewById(R.id.tv_message_ok) as AppCustomTextView
+                                dialogYes.setOnClickListener({ view ->
+                                    simpleDialog.cancel()
+                                    login_TV.isEnabled = false
+                                    disableScreen()
+                                    println("xyzy - login called" + AppUtils.getCurrentDateTime());
+                                    //Crashlytics.getInstance().crash()
+                                    if (TextUtils.isEmpty(username_EDT.text.toString().trim())) {
+                                        showSnackMessage(getString(R.string.error_enter_username))
+                                        login_TV.isEnabled = true
+                                        enableScreen()
+                                    } else if (TextUtils.isEmpty(password_EDT.text.toString().trim())) {
+                                        showSnackMessage(getString(R.string.error_enter_pwd))
+                                        login_TV.isEnabled = true
+                                        enableScreen()
+                                    } else {
+                                        AppUtils.hideSoftKeyboard(this@LoginActivity)
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                            if (Settings.canDrawOverlays(this@LoginActivity)) {
+                                                initiateLogin()
+                                            } else {
+                                                //Permission is not available. Display error text.
+                                                //getOverlayPermission()
+
+                                                // overlay testing
+                                                initiateLogin()
+                                            }
+                                        } else {
+                                            initiateLogin()
+                                        }
+
+
+                                    }
+                                    /*gotoHomeActivity()
+                                    isLoginLoaded = true*/
+                                })
+                                simpleDialog.show()
+                            }
+                            else {
                                 login_TV.isEnabled = false
                                 disableScreen()
                                 println("xyzy - login called" + AppUtils.getCurrentDateTime());
@@ -3940,44 +4048,9 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                 }
                                 /*gotoHomeActivity()
                                 isLoginLoaded = true*/
-                            })
-                            simpleDialog.show()
-                        }
-                        else {
-                            login_TV.isEnabled = false
-                            disableScreen()
-                            println("xyzy - login called" + AppUtils.getCurrentDateTime());
-                            //Crashlytics.getInstance().crash()
-                            if (TextUtils.isEmpty(username_EDT.text.toString().trim())) {
-                                showSnackMessage(getString(R.string.error_enter_username))
-                                login_TV.isEnabled = true
-                                enableScreen()
-                            } else if (TextUtils.isEmpty(password_EDT.text.toString().trim())) {
-                                showSnackMessage(getString(R.string.error_enter_pwd))
-                                login_TV.isEnabled = true
-                                enableScreen()
-                            } else {
-                                AppUtils.hideSoftKeyboard(this@LoginActivity)
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    if (Settings.canDrawOverlays(this@LoginActivity)) {
-                                        initiateLogin()
-                                    } else {
-                                        //Permission is not available. Display error text.
-                                        //getOverlayPermission()
-
-                                        // overlay testing
-                                        initiateLogin()
-                                    }
-                                } else {
-                                    initiateLogin()
-                                }
-
-
                             }
-                            /*gotoHomeActivity()
-                            isLoginLoaded = true*/
-                        }
-                    }, 2200)
+                        }, 2200)
+                    }
                 }
             }
             R.id.forgot_password_TV -> {
@@ -4908,7 +4981,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
 
 
     private fun doAfterLoginFunctionality(loginResponse: LoginResponse) {
-        println("xyz - doLogin end" + AppUtils.getCurrentDateTime());
+        println("xyz - doLogin end" + AppUtils.getCurrentDateTime())
         println("xyz - doAfterLoginFunctionality started" + AppUtils.getCurrentDateTime());
         // setEveningAlarm(this, 15, 9)
 
@@ -6852,6 +6925,13 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                                 }
                                             }
 
+                                            else if (response.getconfigure?.get(i)?.Key.equals("IsShowMenuCRMContacts", ignoreCase = true)) {
+                                                Pref.IsShowMenuCRMContacts = response.getconfigure!![i].Value == "1"
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsShowMenuCRMContacts = response.getconfigure?.get(i)?.Value == "1"
+                                                }
+                                            }
+
                                             /*else if (response.getconfigure?.get(i)?.Key.equals("isFingerPrintMandatoryForAttendance", ignoreCase = true)) {
                                                 if (!TextUtilsDash.isEmpty(response.getconfigure?.get(i)?.Value)) {
                                                     Pref.isFingerPrintMandatoryForAttendance = response.getconfigure?.get(i)?.Value == "1"
@@ -7671,7 +7751,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
     private fun fetchWhatsData(){
         var isDataP = AppDatabase.getDBInstance()?.visitRevisitWhatsappStatusDao()!!.getAll()
         if(isDataP?.size!=0){
-            gotoHomeActivity()
+            checkCRMAvaiable()
         }else if(Pref.IsShowWhatsAppIconforVisit || Pref.IsAutomatedWhatsAppSendforRevisit){
             val repository = EditShopRepoProvider.provideEditShopWithoutImageRepository()
             BaseActivity.compositeDisposable.add(
@@ -7691,8 +7771,158 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                             AppDatabase.getDBInstance()?.visitRevisitWhatsappStatusDao()!!.insertAll(resp.shop_whatsapp_api_list)
                             AppDatabase.getDBInstance()?.visitRevisitWhatsappStatusDao()!!.updateWhatsStatusUpload()
                             Handler().postDelayed(Runnable {
-                                gotoHomeActivity()
+                                checkCRMAvaiable()
                             }, 1000)
+                        }else{
+                            checkCRMAvaiable()
+                        }
+                    }, { error ->
+                        error.printStackTrace()
+                        checkCRMAvaiable()
+                    })
+            )
+        }else {
+            checkCRMAvaiable()
+        }
+    }
+
+    fun checkCRMAvaiable(){
+        if(Pref.IsShowMenuCRMContacts){
+            callCRMCompanyMasterApi()
+        }else{
+            gotoHomeActivity()
+        }
+    }
+
+    fun callCRMCompanyMasterApi(){
+        if((AppDatabase.getDBInstance()?.companyMasterDao()?.getAll() as ArrayList<CompanyMasterEntity>).size>0){
+            callCRMTypeMasterAPI()
+        }else{
+            val repository = EditShopRepoProvider.provideEditShopWithoutImageRepository()
+            BaseActivity.compositeDisposable.add(
+                repository.callCompanyMaster(Pref.session_token.toString())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
+                        val resp = result as ContactMasterRes
+                        if(resp.status == NetworkConstant.SUCCESS){
+                            AppDatabase.getDBInstance()?.companyMasterDao()?.insertAll(resp.company_list)
+                            callCRMTypeMasterAPI()
+                        }else{
+                            callCRMTypeMasterAPI()
+                        }
+                    }, { error ->
+                        error.printStackTrace()
+                        callCRMTypeMasterAPI()
+                    })
+            )
+        }
+    }
+
+    fun callCRMTypeMasterAPI(){
+
+        if((AppDatabase.getDBInstance()?.typeMasterDao()?.getAll() as ArrayList<TypeMasterEntity>).size>0){
+            callCRMStatusMasterAPI()
+        }else{
+            val repository = EditShopRepoProvider.provideEditShopWithoutImageRepository()
+            BaseActivity.compositeDisposable.add(
+                repository.callTypeMaster(Pref.session_token.toString())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
+                        val resp = result as TypeMasterRes
+                        if(resp.status == NetworkConstant.SUCCESS){
+
+                            AppDatabase.getDBInstance()?.typeMasterDao()?.insertAll(resp.type_list)
+                            callCRMStatusMasterAPI()
+
+                        }else{
+                            callCRMStatusMasterAPI()
+                        }
+                    }, { error ->
+                        error.printStackTrace()
+                        callCRMStatusMasterAPI()
+                    })
+            )
+        }
+
+    }
+
+    fun callCRMStatusMasterAPI(){
+
+        if((AppDatabase.getDBInstance()?.statusMasterDao()?.getAll() as ArrayList<StatusMasterEntity>).size>0){
+            callCRMSourceMasterAPI()
+        }else{
+            val repository = EditShopRepoProvider.provideEditShopWithoutImageRepository()
+            BaseActivity.compositeDisposable.add(
+                repository.callStatusMaster(Pref.session_token.toString())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
+                        val resp = result as StatusMasterRes
+                        if(resp.status == NetworkConstant.SUCCESS){
+
+                            AppDatabase.getDBInstance()?.statusMasterDao()?.insertAll(resp.status_list)
+                            callCRMSourceMasterAPI()
+
+                        }else{
+                            callCRMSourceMasterAPI()
+                        }
+                    }, { error ->
+                        error.printStackTrace()
+                        callCRMSourceMasterAPI()
+                    })
+            )
+        }
+
+    }
+
+    fun callCRMSourceMasterAPI(){
+
+        if((AppDatabase.getDBInstance()?.sourceMasterDao()?.getAll() as ArrayList<SourceMasterEntity>).size>0){
+            callCRMStageMasterAPI()
+        }else{
+            val repository = EditShopRepoProvider.provideEditShopWithoutImageRepository()
+            BaseActivity.compositeDisposable.add(
+                repository.callSourceMaster(Pref.session_token.toString())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
+                        val resp = result as SourceMasterRes
+                        if(resp.status == NetworkConstant.SUCCESS){
+
+                            AppDatabase.getDBInstance()?.sourceMasterDao()?.insertAll(resp.source_list)
+                            callCRMStageMasterAPI()
+
+                        }else{
+                            callCRMStageMasterAPI()
+                        }
+                    }, { error ->
+                        error.printStackTrace()
+                        callCRMStageMasterAPI()
+                    })
+            )
+        }
+
+    }
+
+    fun callCRMStageMasterAPI(){
+
+        if((AppDatabase.getDBInstance()?.stageMasterDao()?.getAll() as ArrayList<StageMasterRes>).size>0){
+            gotoHomeActivity()
+        }else{
+            val repository = EditShopRepoProvider.provideEditShopWithoutImageRepository()
+            BaseActivity.compositeDisposable.add(
+                repository.callStageMaster(Pref.session_token.toString())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
+                        val resp = result as StageMasterRes
+                        if(resp.status == NetworkConstant.SUCCESS){
+
+                            AppDatabase.getDBInstance()?.stageMasterDao()?.insertAll(resp.stage_list)
+                            gotoHomeActivity()
+
                         }else{
                             gotoHomeActivity()
                         }
@@ -7701,9 +7931,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                         gotoHomeActivity()
                     })
             )
-        }else {
-            gotoHomeActivity()
         }
+
     }
 
 

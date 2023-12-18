@@ -2444,12 +2444,21 @@ class LogoutSyncFragment : BaseFragment(), View.OnClickListener {
         addOrder.latitude = order.order_lat
         addOrder.longitude = order.order_long
 
-        if (order.scheme_amount != null) {
-            addOrder.scheme_amount = order.scheme_amount
-        }
-        else {
-            addOrder.scheme_amount = ""
+        try{
+            if (order.scheme_amount != null) {
+                if(order.scheme_amount.equals("")){
+                    addOrder.scheme_amount = "0"
+                }else{
+                    addOrder.scheme_amount = order.scheme_amount
+                }
             }
+            else {
+                addOrder.scheme_amount = "0"
+            }
+        }catch (ex:Exception){
+            ex.printStackTrace()
+            addOrder.scheme_amount = "0"
+        }
 
         if (order.remarks != null) {
             addOrder.remarks = order.remarks
@@ -3748,6 +3757,9 @@ class LogoutSyncFragment : BaseFragment(), View.OnClickListener {
 
                 if(shopDurationApiReqForNewShop.shop_list!!.size>0){
                     uploadNewShopVisit(shopDurationApiReqForNewShop,newShopList,shopDataList as ArrayList<ShopDurationRequestData>)
+                    if(!revisitStatusList.isEmpty()){
+                        callRevisitStatusUploadApi(revisitStatusList!!)
+                    }
                 }
                 Handler().postDelayed(Runnable {
                     if(shopDurationApiReqForOldShop.shop_list!!.size>0){
@@ -3887,32 +3899,36 @@ class LogoutSyncFragment : BaseFragment(), View.OnClickListener {
 
 
     private fun callRevisitStatusUploadApi(revisitStatusList : MutableList<ShopRevisitStatusRequestData>){
-        val revisitStatus = ShopRevisitStatusRequest()
-        revisitStatus.user_id=Pref.user_id
-        revisitStatus.session_token=Pref.session_token
-        revisitStatus.ordernottaken_list=revisitStatusList
+        try{
+            val revisitStatus = ShopRevisitStatusRequest()
+            revisitStatus.user_id=Pref.user_id
+            revisitStatus.session_token=Pref.session_token
+            revisitStatus.ordernottaken_list=revisitStatusList
 
-        val repository = ShopRevisitStatusRepositoryProvider.provideShopRevisitStatusRepository()
-        compositeDisposable.add(
+            val repository = ShopRevisitStatusRepositoryProvider.provideShopRevisitStatusRepository()
+            compositeDisposable.add(
                 repository.shopRevisitStatus(revisitStatus)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe({ result ->
-                            Timber.d("callRevisitStatusUploadApi : RESPONSE " + result.status)
-                            if (result.status == NetworkConstant.SUCCESS){
-                                for(i in revisitStatusList.indices){
-                                    AppDatabase.getDBInstance()?.shopVisitOrderStatusRemarksDao()!!.updateOrderStatus(revisitStatusList[i]!!.shop_revisit_uniqKey!!)
-                                }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
+                        Timber.d("callRevisitStatusUploadApi : RESPONSE " + result.status)
+                        if (result.status == NetworkConstant.SUCCESS){
+                            for(i in revisitStatusList.indices){
+                                AppDatabase.getDBInstance()?.shopVisitOrderStatusRemarksDao()!!.updateOrderStatus(revisitStatusList[i]!!.shop_revisit_uniqKey!!)
                             }
-                        },{error ->
-                            if (error == null) {
-                                Timber.d("callRevisitStatusUploadApi : ERROR " + "UNEXPECTED ERROR IN SHOP ACTIVITY API")
-                            } else {
-                                Timber.d("callRevisitStatusUploadApi : ERROR " + error.localizedMessage)
-                                error.printStackTrace()
-                            }
-                        })
-        )
+                        }
+                    },{error ->
+                        if (error == null) {
+                            Timber.d("callRevisitStatusUploadApi : ERROR " + "UNEXPECTED ERROR IN SHOP ACTIVITY API")
+                        } else {
+                            Timber.d("callRevisitStatusUploadApi : ERROR " + error.localizedMessage)
+                            error.printStackTrace()
+                        }
+                    })
+            )
+        }catch (ex:Exception){
+            ex.printStackTrace()
+        }
     }
 
 

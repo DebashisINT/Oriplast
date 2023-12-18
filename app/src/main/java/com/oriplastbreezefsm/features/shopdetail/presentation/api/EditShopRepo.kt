@@ -13,6 +13,11 @@ import com.oriplastbreezefsm.features.addshop.model.AddLogReqData
 import com.oriplastbreezefsm.features.addshop.model.AddShopRequestData
 import com.oriplastbreezefsm.features.addshop.model.AddShopResponse
 import com.oriplastbreezefsm.features.addshop.model.LogFileResponse
+import com.oriplastbreezefsm.features.contacts.ContactMasterRes
+import com.oriplastbreezefsm.features.contacts.SourceMasterRes
+import com.oriplastbreezefsm.features.contacts.StageMasterRes
+import com.oriplastbreezefsm.features.contacts.StatusMasterRes
+import com.oriplastbreezefsm.features.contacts.TypeMasterRes
 import com.oriplastbreezefsm.features.dashboard.presentation.DashboardActivity
 import com.oriplastbreezefsm.features.document.model.AddEditDocumentInputParams
 import com.oriplastbreezefsm.features.document.model.DocumentAttachmentModel
@@ -42,6 +47,24 @@ class EditShopRepo(val apiService: EditShopApi) {
         return apiService.whatsAppStatusFetchApi(user_id)
     }
 
+    fun callCompanyMaster(session_token: String): Observable<ContactMasterRes> {
+        return apiService.callCompanyMasterApi(session_token)
+    }
+
+    fun callTypeMaster(session_token: String): Observable<TypeMasterRes> {
+        return apiService.callTypeMasterApi(session_token)
+    }
+
+    fun callStatusMaster(session_token: String): Observable<StatusMasterRes> {
+        return apiService.callStatusMasterApi(session_token)
+    }
+    fun callSourceMaster(session_token: String): Observable<SourceMasterRes> {
+        return apiService.callSourceMasterApi(session_token)
+    }
+
+    fun callStageMaster(session_token: String): Observable<StageMasterRes> {
+        return apiService.callStageMasterApi(session_token)
+    }
 
     fun addShopWithImage(shop: AddShopRequestData, shop_image: String?, context: Context): Observable<AddShopResponse> {
         var profile_img_data: MultipartBody.Part? = null

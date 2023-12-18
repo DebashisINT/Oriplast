@@ -13,6 +13,8 @@
     <!--Map Key-->
     <!--<string name="MAP_ProjectAPIKey">AIzaSyBRrqsLZFqThqM8uxw_k94pZMbv3-3h0dM</string>-->
     <string name="MAP_ProjectAPIKey" translatable="false">AIzaSyC3S3fp6jLyhf-Nm_ks9CpIiIF1YFOr2Jc</string>
+    <string name="facebook_app_id" translatable="false">260734547001450</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb260734547001450</string>
 
     <!--Login-->
     <string name="username_new" translatable="false">Username</string>

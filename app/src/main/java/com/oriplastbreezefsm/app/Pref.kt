@@ -975,5 +975,24 @@ object Pref : PreferenceHolder() {
     var IsAutoLogoutFromBatteryCheck: Boolean by bindToPreferenceField(false, "IsAutoLogoutFromBatteryCheck")
     var IsLoggedIn: Boolean by bindToPreferenceField(false, "IsLoggedIn")
     var IsAnyPageVisitFromDshboard: Boolean by bindToPreferenceField(false, "IsAnyPageVisitFromDshboard")
+
+    //Begin Puja 16.11.23 mantis-0026997 //
+
+    var isLeadContactNumber: Boolean by bindToPreferenceField(false, "isLeadContactNumber")
+    var isModelEnable: Boolean by bindToPreferenceField(false, "isModelEnable")
+    var isPrimaryApplicationEnable: Boolean by bindToPreferenceField(false, "isPrimaryApplicationEnable")
+    var isSecondaryApplicationEnable: Boolean by bindToPreferenceField(false, "isSecondaryApplicationEnable")
+    var isBookingAmount: Boolean by bindToPreferenceField(false, "isBookingAmount")
+    var isLeadTypeEnable: Boolean by bindToPreferenceField(false, "isLeadTypeEnable")
+    var isStageEnable: Boolean by bindToPreferenceField(false, "isStageEnable")
+    var isFunnelStageEnable: Boolean by bindToPreferenceField(false, "isFunnelStageEnable")
+
+    //End puja 16.11.23 mantis-0026997 //
+
+    var IsShowMenuCRMContacts: Boolean by bindToPreferenceField(false, "IsShowMenuCRMContacts")
+
+    //mantis id 27063 Suman 04-12-2023
+    var IsCallLogHistoryActivated: Boolean by bindToPreferenceField(false, "IsCallLogHistoryActivated")
 }
+
 

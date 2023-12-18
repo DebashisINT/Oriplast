@@ -1,10 +1,12 @@
 package com.oriplastbreezefsm;
 
-import android.media.MediaPlayer;
-import android.os.Vibrator;
+import android.content.Context;
+import android.database.Cursor;
+import android.provider.CallLog;
 
 import com.oriplastbreezefsm.features.lead.model.CustomerListReq;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -87,6 +89,5 @@ public class CustomStatic {
     public static String lead_msgLeadEnquiry = "";
 
     public static Boolean IsTeamAllParty = false;
-
 
 }

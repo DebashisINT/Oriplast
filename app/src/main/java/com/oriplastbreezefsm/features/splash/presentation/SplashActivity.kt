@@ -2,6 +2,7 @@ package com.oriplastbreezefsm.features.splash.presentation
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.app.Activity
 import android.app.Dialog
 import android.content.ComponentName
@@ -22,8 +23,11 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import com.oriplastbreezefsm.BuildConfig
 import com.oriplastbreezefsm.R
+import com.oriplastbreezefsm.app.AppDatabase
 import com.oriplastbreezefsm.app.NetworkConstant
 import com.oriplastbreezefsm.app.Pref
+import com.oriplastbreezefsm.app.domain.AddShopDBModelEntity
+import com.oriplastbreezefsm.app.domain.CallHisEntity
 import com.oriplastbreezefsm.app.uiaction.DisplayAlert
 import com.oriplastbreezefsm.app.utils.AppUtils
 import com.oriplastbreezefsm.app.utils.FileLoggingTree
@@ -39,6 +43,7 @@ import com.oriplastbreezefsm.features.dashboard.presentation.DashboardActivity
 import com.oriplastbreezefsm.features.location.LocationWizard
 import com.oriplastbreezefsm.features.location.SingleShotLocationProvider
 import com.oriplastbreezefsm.features.login.presentation.LoginActivity
+import com.oriplastbreezefsm.features.nearbyshops.presentation.ShopCallHisFrag
 import com.oriplastbreezefsm.features.splash.presentation.api.VersionCheckingRepoProvider
 import com.oriplastbreezefsm.features.splash.presentation.model.VersionCheckingReponseModel
 import com.oriplastbreezefsm.widgets.AppCustomTextView
@@ -155,6 +160,8 @@ class SplashActivity : BaseActivity(), GpsStatusDetector.GpsStatusDetectorCallBa
     }
 
 
+
+
     fun checkBatteryOptiSettings(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val intent = Intent()
@@ -241,6 +248,7 @@ class SplashActivity : BaseActivity(), GpsStatusDetector.GpsStatusDetectorCallBa
             Timber.d("Permission Name"+permListDenied.get(i).permissionName + " Status : Denied")
         }
     }
+
 
     private fun initPermissionCheck() {
 

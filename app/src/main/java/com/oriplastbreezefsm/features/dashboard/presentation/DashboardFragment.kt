@@ -1497,13 +1497,8 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
             }
 
             R.id.fab -> {
-                if (!Pref.isAddAttendence){
-                    if(AppUtils.isOnline(mContext)){
-                        (mContext as DashboardActivity).checkToShowAddAttendanceAlert()
-                    }else{
-                        Toaster.msgLong(mContext,getString(R.string.no_internet))
-                    }
-                }
+                if (!Pref.isAddAttendence)
+                    (mContext as DashboardActivity).checkToShowAddAttendanceAlert()
                 else {
                     /*if (!Pref.isMeetingAvailable)
                         (mContext as DashboardActivity).loadFragment(FragType.AddShopFragment, true, "")
@@ -4743,6 +4738,11 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                                                 if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
                                                     Pref.IsDisabledUpdateAddress = response.getconfigure?.get(i)?.Value == "1"
                                                 }
+                                            }else if (response.getconfigure?.get(i)?.Key.equals("IsShowMenuCRMContacts", ignoreCase = true)) {
+                                                Pref.IsShowMenuCRMContacts = response.getconfigure!![i].Value == "1"
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsShowMenuCRMContacts = response.getconfigure?.get(i)?.Value == "1"
+                                                }
                                             }
                                         }
                                     }
@@ -5168,6 +5168,35 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                                     Pref.FSSAILicNoMandatoryInShop4 = configResponse.FSSAILicNoMandatoryInShop4!!
                                 //Edit v 4.1.6 Tufan 21/09/2023 mantis 26812 AND 26813  FSSAI Lic No and GSTINPANMandatoryforSHOPTYPE4 In add shop page edit
 
+                                //Begin Puja 16.11.23 mantis-0026997 //
+
+                                if (configResponse.isLeadContactNumber != null)
+                                    Pref.isLeadContactNumber = configResponse.isLeadContactNumber!!
+
+                                if (configResponse.isModelEnable != null)
+                                    Pref.isModelEnable = configResponse.isModelEnable!!
+
+                                if (configResponse.isPrimaryApplicationEnable != null)
+                                    Pref.isPrimaryApplicationEnable = configResponse.isPrimaryApplicationEnable!!
+
+                                if (configResponse.isSecondaryApplicationEnable != null)
+                                    Pref.isSecondaryApplicationEnable = configResponse.isSecondaryApplicationEnable!!
+
+                                if (configResponse.isBookingAmount != null)
+                                    Pref.isBookingAmount = configResponse.isBookingAmount!!
+
+                                if (configResponse.isLeadTypeEnable != null)
+                                    Pref.isLeadTypeEnable = configResponse.isLeadTypeEnable!!
+
+                                if (configResponse.isStageEnable != null)
+                                    Pref.isStageEnable = configResponse.isStageEnable!!
+
+                                if (configResponse.isFunnelStageEnable != null)
+                                    Pref.isFunnelStageEnable = configResponse.isFunnelStageEnable!!
+
+
+                                //End Puja 16.11.23 mantis-0026997 //
+
 
                             }
                             BaseActivity.isApiInitiated = false
@@ -5182,7 +5211,22 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                                 Pref.isShowBeatGroup = false
                                 Pref.IsShowBeatInMenu = false
                             }
-                            
+
+                            //Begin Puja 16.11.23 mantis-0026997 //
+
+                            if(Pref.isCustomerFeatureEnable==false){
+                                Pref.isLeadContactNumber = false
+                                Pref.isModelEnable = false
+                                Pref.isPrimaryApplicationEnable = false
+                                Pref.isSecondaryApplicationEnable = false
+                                Pref.isBookingAmount = false
+                                Pref.isLeadTypeEnable = false
+                                Pref.isStageEnable = false
+                                Pref.isFunnelStageEnable = false
+                            }
+
+                            //End Puja 16.11.23 mantis-0026997 //
+
                             checkToCallAssignedDDListApi()   // calling instead of checkToCallAlarmConfigApi()
 
                         }, { error ->

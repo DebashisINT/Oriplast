@@ -41,6 +41,8 @@ import kotlinx.android.synthetic.main.inflate_registered_shops.view.add_quot_ll
 import kotlinx.android.synthetic.main.inflate_registered_shops.view.avg_order_amount_tv
 import kotlinx.android.synthetic.main.inflate_registered_shops.view.call_iv
 import kotlinx.android.synthetic.main.inflate_registered_shops.view.call_ll
+import kotlinx.android.synthetic.main.inflate_registered_shops.view.call_log_his_ll
+import kotlinx.android.synthetic.main.inflate_registered_shops.view.call_log_his_view
 import kotlinx.android.synthetic.main.inflate_registered_shops.view.call_tv
 import kotlinx.android.synthetic.main.inflate_registered_shops.view.collection_view
 import kotlinx.android.synthetic.main.inflate_registered_shops.view.direction_ll
@@ -1087,7 +1089,17 @@ class NearByShopsListAdapter(context: Context, list: List<AddShopDBModelEntity>,
                         itemView.new_multi_view.visibility = View.GONE
                     }
 
+            if(Pref.IsCallLogHistoryActivated){
+                itemView.call_log_his_ll.visibility = View.VISIBLE
+                itemView.call_log_his_view.visibility = View.VISIBLE
+            }else{
+                itemView.call_log_his_ll.visibility = View.GONE
+                itemView.call_log_his_view.visibility = View.GONE
+            }
 
+            itemView.call_log_his_ll.setOnClickListener {
+                (context as DashboardActivity).loadFragment(FragType.ShopCallHisFrag, true, list[adapterPosition].shop_id)
+            }
 
 
         }

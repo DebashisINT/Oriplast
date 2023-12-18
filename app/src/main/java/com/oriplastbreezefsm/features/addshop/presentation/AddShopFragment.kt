@@ -287,6 +287,15 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
     private lateinit var tv_addContact5: TextView
     private lateinit var tv_addContact6: TextView
     private lateinit var ll_addExtraContactRoot: LinearLayout
+    //Begin Puja 16.11.23 mantis-0026997 //
+    private lateinit var rl_frag_addshop_model_view: RelativeLayout
+    private lateinit var rl_frag_addshop_priapp_view: RelativeLayout
+    private lateinit var rl_frag_addshop_secondapp_view: RelativeLayout
+    private lateinit var rl_booking_amount: RelativeLayout
+    private lateinit var rl_frag_addshop_leadtyp_view: RelativeLayout
+    private lateinit var rl_frag_addshop_stage_view: RelativeLayout
+    private lateinit var rl_frag_addshop_funnelstage_view: RelativeLayout
+    //End Puja 16.11.23 mantis-0026997 //
 
     private var fingerprintDialog: FingerprintDialog? = null
     private var areaId = ""
@@ -812,6 +821,16 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
         tv_addContact6.setOnClickListener(this)
         ll_addExtraContactRoot = view.findViewById(R.id.ll_frag_add_shop_more_contact_root)
 
+        //Begin Puja 16.11.23 mantis-0026997 //
+        rl_frag_addshop_model_view = view.findViewById(R.id.rl_frag_addshop_model_view)
+        rl_frag_addshop_priapp_view = view.findViewById(R.id.rl_frag_addshop_priapp_view)
+        rl_frag_addshop_secondapp_view = view.findViewById(R.id.rl_frag_addshop_secondapp_view)
+        rl_booking_amount = view.findViewById(R.id.rl_booking_amount)
+        rl_frag_addshop_leadtyp_view = view.findViewById(R.id.rl_frag_addshop_leadtyp_view)
+        rl_frag_addshop_stage_view = view.findViewById(R.id.rl_frag_addshop_stage_view)
+        rl_frag_addshop_funnelstage_view = view.findViewById(R.id.rl_frag_addshop_funnelstage_view)
+        //End Puja 16.11.23 mantis-0026997 //
+
         if(Pref.IsMultipleContactEnableforShop){
             ll_addExtraContactRoot.visibility = View.VISIBLE
         }else{
@@ -910,8 +929,6 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
             FSSAILicNumberRL.visibility = View.GONE
         }
 
-
-
         val typeList = AppDatabase.getDBInstance()?.shopTypeDao()?.getAll()
         if (typeList != null && typeList.isNotEmpty()) {
             type_TV.text = typeList[0].shoptype_name
@@ -927,7 +944,8 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
 
         if (Pref.isCustomerFeatureEnable) {
             ll_customer_view.visibility = View.VISIBLE
-            rl_owner_name_main.visibility = View.GONE
+          //  rl_owner_name_main.visibility = View.GONE
+            rl_owner_name_main.visibility = View.VISIBLE
             til_no.hint = Pref.contactNumberText + " Number"
             til_mail.hint = Pref.emailText
 //            til_name.hint = Pref.contactNumberText + " Number"
@@ -942,6 +960,59 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
             rl_select_retailer.visibility = View.GONE
             rl_select_dealer.visibility = View.GONE
             assign_to_shop_rl.visibility = View.GONE
+
+            //Begin Puja 16.11.23 mantis-0026997 //
+
+            if (Pref.isLeadContactNumber){
+                rl_contact_lead.visibility =View.VISIBLE
+            }
+            else {
+                rl_contact_lead.visibility =View.GONE
+            }
+            if (Pref.isModelEnable){
+                rl_frag_addshop_model_view.visibility =View.VISIBLE
+            }
+            else {
+                rl_frag_addshop_model_view.visibility =View.GONE
+            }
+            if (Pref.isPrimaryApplicationEnable){
+                rl_frag_addshop_priapp_view.visibility =View.VISIBLE
+            }
+            else {
+                rl_frag_addshop_priapp_view.visibility =View.GONE
+            }
+            if (Pref.isSecondaryApplicationEnable){
+                rl_frag_addshop_secondapp_view.visibility =View.VISIBLE
+            }
+            else {
+                rl_frag_addshop_secondapp_view.visibility =View.GONE
+            }
+            if (Pref.isBookingAmount){
+                rl_booking_amount.visibility =View.VISIBLE
+            }
+            else {
+                rl_booking_amount.visibility =View.GONE
+            }
+            if (Pref.isLeadTypeEnable){
+                rl_frag_addshop_leadtyp_view.visibility =View.VISIBLE
+            }
+            else {
+                rl_frag_addshop_leadtyp_view.visibility =View.GONE
+            }
+            if (Pref.isStageEnable){
+                rl_frag_addshop_stage_view.visibility =View.VISIBLE
+            }
+            else {
+                rl_frag_addshop_stage_view.visibility =View.GONE
+            }
+            if (Pref.isFunnelStageEnable){
+                rl_frag_addshop_funnelstage_view.visibility =View.VISIBLE
+            }
+            else {
+                rl_frag_addshop_funnelstage_view.visibility =View.GONE
+            }
+
+            //End Puja 16.11.23 mantis-0026997 //
         }
         else {
             ll_customer_view.visibility = View.GONE
@@ -1568,6 +1639,17 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
             else{
                 tv_feedback_asterisk_mark.visibility = View.GONE
             }
+
+            //Begin Puja 16.11.23 mantis-0026997 //
+            rl_contact_lead.visibility = View.GONE
+            rl_frag_addshop_model_view.visibility = View.GONE
+            rl_frag_addshop_priapp_view.visibility = View.GONE
+            rl_frag_addshop_secondapp_view.visibility = View.GONE
+            rl_booking_amount.visibility = View.GONE
+            rl_frag_addshop_leadtyp_view.visibility = View.GONE
+            rl_frag_addshop_stage_view.visibility = View.GONE
+            rl_frag_addshop_funnelstage_view.visibility = View.GONE
+            //End Puja 16.11.23 mantis-0026997 //
 
         }
 
@@ -6254,13 +6336,13 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
             return
         }
 
-        if (Pref.isCustomerFeatureEnable && TextUtils.isEmpty(modelId)) {
+        if (Pref.isCustomerFeatureEnable && TextUtils.isEmpty(modelId) && Pref.isModelEnable) {
             BaseActivity.isApiInitiated = false
             (mContext as DashboardActivity).showSnackMessage(getString(R.string.error_select_model))
             return
         }
 
-        if (Pref.isCustomerFeatureEnable && TextUtils.isEmpty(stageId)) {
+        if (Pref.isCustomerFeatureEnable && TextUtils.isEmpty(stageId) && Pref.isStageEnable) {
             BaseActivity.isApiInitiated = false
             (mContext as DashboardActivity).showSnackMessage(getString(R.string.error_select_stage))
             return
@@ -7683,7 +7765,8 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
                             rl_type.visibility = View.GONE
                             setMargin(false)
                             contactHeader.visibility = View.GONE
-                            rl_owner_name_main.visibility = View.GONE
+                           // rl_owner_name_main.visibility = View.GONE
+                            rl_owner_name_main.visibility = View.VISIBLE
                             rl_area_main.visibility = View.GONE
                             ownerNumberLL.visibility = View.GONE
                             owneremailLL.visibility = View.GONE

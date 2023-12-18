@@ -321,6 +321,8 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
                 notificationChannel.lightColor = applicationContext.getColor(R.color.colorPrimary)
                 notificationChannel.enableVibration(true)
                 notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+
+               // println("puja")
                 notificationManager.createNotificationChannel(notificationChannel)
 
                 val notification = NotificationCompat.Builder(this)
@@ -688,6 +690,7 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
 
         try {
             println("service_tag ${Pref.current_latitude.toString()} long - ${Pref.current_longitude.toString()}")
+
             if (location != null) {
                 // 8.0 LocationFuzedService AppV 4.0.7 Suman   18/03/2023 Location lat-long updation
                 AppUtils.mLocation = location
@@ -3466,6 +3469,9 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
 
                     if(shopDurationApiReqForNewShop.shop_list!!.size>0){
                         uploadNewShopVisit(shopDurationApiReqForNewShop,newShopList,shopDataList as ArrayList<ShopDurationRequestData>)
+                        if(!revisitStatusList.isEmpty()){
+                            callRevisitStatusUploadApi(revisitStatusList!!)
+                        }
                     }
                     Handler().postDelayed(Runnable {
                         if(shopDurationApiReqForOldShop.shop_list!!.size>0){ compositeDisposable.add(
@@ -3624,35 +3630,39 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
 
 
     private fun callRevisitStatusUploadApi(revisitStatusList: MutableList<ShopRevisitStatusRequestData>) {
-        val revisitStatus = ShopRevisitStatusRequest()
-        revisitStatus.user_id = Pref.user_id
-        revisitStatus.session_token = Pref.session_token
-        revisitStatus.ordernottaken_list = revisitStatusList
+        try{
+            val revisitStatus = ShopRevisitStatusRequest()
+            revisitStatus.user_id = Pref.user_id
+            revisitStatus.session_token = Pref.session_token
+            revisitStatus.ordernottaken_list = revisitStatusList
 
-        val repository = ShopRevisitStatusRepositoryProvider.provideShopRevisitStatusRepository()
-        compositeDisposable.add(
+            val repository = ShopRevisitStatusRepositoryProvider.provideShopRevisitStatusRepository()
+            compositeDisposable.add(
                 repository.shopRevisitStatus(revisitStatus)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe({ result ->
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
 //                            XLog.d("callRevisitStatusUploadApi : RESPONSE " + result.status)
-                            Timber.d("callRevisitStatusUploadApi : RESPONSE " + result.status)
-                            if (result.status == NetworkConstant.SUCCESS) {
-                                for (i in revisitStatusList.indices) {
-                                    AppDatabase.getDBInstance()?.shopVisitOrderStatusRemarksDao()!!.updateOrderStatus(revisitStatusList[i]!!.shop_revisit_uniqKey!!)
-                                }
+                        Timber.d("callRevisitStatusUploadApi : RESPONSE " + result.status)
+                        if (result.status == NetworkConstant.SUCCESS) {
+                            for (i in revisitStatusList.indices) {
+                                AppDatabase.getDBInstance()?.shopVisitOrderStatusRemarksDao()!!.updateOrderStatus(revisitStatusList[i]!!.shop_revisit_uniqKey!!)
                             }
-                        }, { error ->
-                            if (error == null) {
+                        }
+                    }, { error ->
+                        if (error == null) {
 //                                XLog.d("callRevisitStatusUploadApi : ERROR " + "UNEXPECTED ERROR IN SHOP ACTIVITY API")
-                                Timber.d("callRevisitStatusUploadApi : ERROR " + "UNEXPECTED ERROR IN SHOP ACTIVITY API")
-                            } else {
+                            Timber.d("callRevisitStatusUploadApi : ERROR " + "UNEXPECTED ERROR IN SHOP ACTIVITY API")
+                        } else {
 //                                XLog.d("callRevisitStatusUploadApi : ERROR " + error.localizedMessage)
-                                Timber.d("callRevisitStatusUploadApi : ERROR " + error.localizedMessage)
-                                error.printStackTrace()
-                            }
-                        })
-        )
+                            Timber.d("callRevisitStatusUploadApi : ERROR " + error.localizedMessage)
+                            error.printStackTrace()
+                        }
+                    })
+            )
+        }catch (ex:Exception){
+            ex.printStackTrace()
+        }
     }
 
 

@@ -5,6 +5,11 @@ import com.oriplastbreezefsm.base.BaseResponse
 import com.oriplastbreezefsm.features.addshop.model.AddShopRequestData
 import com.oriplastbreezefsm.features.addshop.model.AddShopResponse
 import com.oriplastbreezefsm.features.addshop.model.LogFileResponse
+import com.oriplastbreezefsm.features.contacts.ContactMasterRes
+import com.oriplastbreezefsm.features.contacts.SourceMasterRes
+import com.oriplastbreezefsm.features.contacts.StageMasterRes
+import com.oriplastbreezefsm.features.contacts.StatusMasterRes
+import com.oriplastbreezefsm.features.contacts.TypeMasterRes
 import com.oriplastbreezefsm.features.login.model.WhatsappApiData
 import com.oriplastbreezefsm.features.login.model.WhatsappApiFetchData
 import io.reactivex.Observable
@@ -41,6 +46,30 @@ interface EditShopApi {
     @Multipart
     @POST("APPLogFilesDetection/APPLogFilesSave")
     fun logshareFile(@Query("data") userId: String, @Part attachments: MultipartBody.Part?): Observable<LogFileResponse>
+
+    @FormUrlEncoded
+    @POST("CRMContactInfo/CRMCompanyList")
+    fun callCompanyMasterApi(@Field("session_token") session_token: String): Observable<ContactMasterRes>
+
+
+    @FormUrlEncoded
+    @POST("CRMContactInfo/CRMTypeList")
+    fun callTypeMasterApi(@Field("session_token") session_token: String): Observable<TypeMasterRes>
+
+
+    @FormUrlEncoded
+    @POST("CRMContactInfo/CRMStatusList")
+    fun callStatusMasterApi(@Field("session_token") session_token: String): Observable<StatusMasterRes>
+
+
+    @FormUrlEncoded
+    @POST("CRMContactInfo/CRMSourceList")
+    fun callSourceMasterApi(@Field("session_token") session_token: String): Observable<SourceMasterRes>
+
+    @FormUrlEncoded
+    @POST("CRMContactInfo/CRMStageList")
+    fun callStageMasterApi(@Field("session_token") session_token: String): Observable<StageMasterRes>
+
 
     /**
      * Companion object to create the GithubApiService
