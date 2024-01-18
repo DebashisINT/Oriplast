@@ -950,7 +950,8 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
 
         var accuracy = 0f
         accuracy = if (AppUtils.isOnline(this))
-            AppUtils.minAccuracy.toFloat()
+            //AppUtils.minAccuracy.toFloat()
+            Pref.minAccuracy.toFloat()
         else
             800f
 
@@ -965,7 +966,7 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
 
             accuracyStatus = "inaccurate"
 
-            Timber.e("=Inaccurate location (Location Fuzed Service)=")
+            Timber.d("=Inaccurate location (Location Fuzed Service)= ${location.latitude},${location.longitude}")
 
             if (!TextUtils.isEmpty(Pref.home_latitude) && !TextUtils.isEmpty(Pref.home_longitude)) {
                 val distance = LocationWizard.getDistance(Pref.home_latitude.toDouble(), Pref.home_longitude.toDouble(), location.latitude, location.longitude)
@@ -2867,9 +2868,15 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
                 var prevDateTime = obj.updateDateTime
                 var savingDateTime = location.updateDateTime
                 var diffInMin = AppUtils.getDiffDateTime(prevDateTime.toString(),savingDateTime.toString())
-                if(diffInMin<3 && location.distance.toDouble().toInt()>4){
-                    location.distance = (AppUtils.maxDistance.toDouble()/1000).toString()
+                Timber.d("LocFuzed final loc data diffInMin: $diffInMin  location.distance ${location.distance}" )
+                println("tag_x_dist diffInMin: $diffInMin  location.distance ${location.distance} lat:long ${location.latitude},${location.longitude}")
+                //mantis id 27172 begin
+                if(diffInMin<3 && location.distance.toDouble().toInt()>8){
+                    location.distance = ((AppUtils.maxDistance.toDouble()/1000)*diffInMin).toString()
+                    Timber.d("LocFuzed final loc data inside if diffInMin: $diffInMin  location.distance ${location.distance}" )
+                    println("tag_x_dist inside if diffInMin: $diffInMin  location.distance ${location.distance} lat:long ${location.latitude},${location.longitude}")
                 }
+                //mantis id 27172 end
             }
         }catch (ex:Exception){
             ex.printStackTrace()

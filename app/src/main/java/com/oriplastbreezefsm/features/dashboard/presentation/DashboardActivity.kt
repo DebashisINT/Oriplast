@@ -448,7 +448,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         //initPermissionCheckOne()
         //Pref.IsCallLogHistoryActivated = true
         Pref.MultiVisitIntervalInMinutes = "1"
-       // Pref.IsUsbDebuggingRestricted = false
+        //Pref.IsUsbDebuggingRestricted = false
         println("load_frag " + mFragType.toString() + "     " + Pref.user_id.toString()+" "+Pref.MultiVisitIntervalInMinutes )
         batteryCheck(mFragType,addToStack,initializeObject)
         /*if (addToStack) {

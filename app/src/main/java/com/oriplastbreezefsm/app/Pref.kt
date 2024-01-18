@@ -993,6 +993,7 @@ object Pref : PreferenceHolder() {
 
     //mantis id 27063 Suman 04-12-2023
     var IsCallLogHistoryActivated: Boolean by bindToPreferenceField(false, "IsCallLogHistoryActivated")
+    var minAccuracy: String by bindToPreferenceField("200", "minAccuracy")
 }
 
 

@@ -413,7 +413,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                     AppUtils.maxAccuracy = configResponse.max_accuracy!!
 
                                 if (!TextUtils.isEmpty(configResponse.min_accuracy))
-                                    AppUtils.minAccuracy = configResponse.min_accuracy!!
+                                    //AppUtils.minAccuracy = configResponse.min_accuracy!!
+                                    Pref.minAccuracy = configResponse.min_accuracy!!
 
                                 /*if (!TextUtils.isEmpty(configResponse.idle_time))
                                     AppUtils.idle_time = configResponse.idle_time!!*/
