@@ -1238,6 +1238,22 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
                     userlocation.updateDateTime = AppUtils.getCurrentDateTime()
                     userlocation.network_status = if (AppUtils.isOnline(this)) "Online" else "Offline"
                     userlocation.battery_percentage = AppUtils.getBatteryPercentage(this).toString()
+
+                    //negative distance handle Suman 06-02-2024 mantis id 0027225 begin
+                    try{
+                        var distReftify = userlocation.distance.toDouble()
+                        if(distReftify<0){
+                            var locL = AppDatabase.getDBInstance()!!.userLocationDataDao().getLocationUpdateForADay(AppUtils.getCurrentDateForShopActi()) as ArrayList<UserLocationDataEntity>
+                            var lastLoc = locL.get(locL.size-1)
+                            var d = LocationWizard.getDistance(userlocation.latitude.toDouble(),userlocation.longitude.toDouble(), lastLoc.latitude.toDouble()   ,lastLoc.longitude.toDouble())
+                            userlocation.distance = d.toString()
+                        }
+                    }catch (ex:Exception){
+                        ex.printStackTrace()
+                        userlocation.distance = "0.0"
+                    }
+                    //negative distance handle Suman 06-02-2024 mantis id 0027225 end
+
                     AppDatabase.getDBInstance()!!.userLocationDataDao().insertAll(userlocation)
 
                     Timber.e("=====Shop auto revisit data added=======")
@@ -2871,7 +2887,7 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
                 Timber.d("LocFuzed final loc data diffInMin: $diffInMin  location.distance ${location.distance}" )
                 println("tag_x_dist diffInMin: $diffInMin  location.distance ${location.distance} lat:long ${location.latitude},${location.longitude}")
                 //mantis id 27172 begin
-                if(diffInMin<3 && location.distance.toDouble().toInt()>8){
+                if(diffInMin<3 && location.distance.toDouble().toInt()>5){
                     location.distance = ((AppUtils.maxDistance.toDouble()/1000)*diffInMin).toString()
                     Timber.d("LocFuzed final loc data inside if diffInMin: $diffInMin  location.distance ${location.distance}" )
                     println("tag_x_dist inside if diffInMin: $diffInMin  location.distance ${location.distance} lat:long ${location.latitude},${location.longitude}")
@@ -2884,6 +2900,21 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
         //end distance correction
 
         Timber.d(" save loc ${location.latitude} ${location.longitude} ${location.distance}")
+
+        //negative distance handle Suman 06-02-2024 mantis id 0027225 begin
+        try{
+            var distReftify = location.distance.toDouble()
+            if(distReftify<0){
+                var locL = AppDatabase.getDBInstance()!!.userLocationDataDao().getLocationUpdateForADay(AppUtils.getCurrentDateForShopActi()) as ArrayList<UserLocationDataEntity>
+                var lastLoc = locL.get(locL.size-1)
+                var d = LocationWizard.getDistance(location.latitude.toDouble(),location.longitude.toDouble(), lastLoc.latitude.toDouble()   ,lastLoc.longitude.toDouble())
+                location.distance = d.toString()
+            }
+        }catch (ex:Exception){
+            ex.printStackTrace()
+            location.distance = "0.0"
+        }
+        //negative distance handle Suman 06-02-2024 mantis id 0027225 end
 
         AppDatabase.getDBInstance()!!.userLocationDataDao().insertAll(location)
 //        XLog.d("Shop to shop distance (At accurate loc save time)====> " + Pref.totalS2SDistance)
@@ -4661,6 +4692,22 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
                     userlocation.updateDateTime = AppUtils.getCurrentDateTime()
                     userlocation.network_status = if (AppUtils.isOnline(this)) "Online" else "Offline"
                     userlocation.battery_percentage = AppUtils.getBatteryPercentage(this).toString()
+
+                    //negative distance handle Suman 06-02-2024 mantis id 0027225 begin
+                    try{
+                        var distReftify = userlocation.distance.toDouble()
+                        if(distReftify<0){
+                            var locL = AppDatabase.getDBInstance()!!.userLocationDataDao().getLocationUpdateForADay(AppUtils.getCurrentDateForShopActi()) as ArrayList<UserLocationDataEntity>
+                            var lastLoc = locL.get(locL.size-1)
+                            var d = LocationWizard.getDistance(userlocation.latitude.toDouble(),userlocation.longitude.toDouble(), lastLoc.latitude.toDouble()   ,lastLoc.longitude.toDouble())
+                            userlocation.distance = d.toString()
+                        }
+                    }catch (ex:Exception){
+                        ex.printStackTrace()
+                        userlocation.distance = "0.0"
+                    }
+                    //negative distance handle Suman 06-02-2024 mantis id 0027225 end
+
                     AppDatabase.getDBInstance()!!.userLocationDataDao().insertAll(userlocation)
 
                     Timber.e("=====Shop auto revisit data added=======")
